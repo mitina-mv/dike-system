@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateOrgsTable extends Migration
+class CreateStudgroupsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,10 @@ class CreateOrgsTable extends Migration
      */
     public function up()
     {
-        Schema::create('orgs', function (Blueprint $table) {
+        Schema::create('studgroups', function (Blueprint $table) {
             $table->id();
-            $table->string('org_name');
-            $table->string('org_address');
-            $table->jsonb('org_info');
+            $table->foreignId('org_id')->constrained('orgs');
+            $table->string('studgroup_name');
         });
     }
 
@@ -28,6 +27,6 @@ class CreateOrgsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('orgs');
+        Schema::dropIfExists('studgroups');
     }
 }
