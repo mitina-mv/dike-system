@@ -24,7 +24,7 @@ class PasswordConfirmationTest extends TestCase
         $user = User::factory()->create();
 
         $response = $this->actingAs($user)->post('/confirm-password', [
-            'password' => 'password',
+            'user_password' => 'password',
         ]);
 
         $response->assertRedirect();
@@ -36,7 +36,7 @@ class PasswordConfirmationTest extends TestCase
         $user = User::factory()->create();
 
         $response = $this->actingAs($user)->post('/confirm-password', [
-            'password' => 'wrong-password',
+            'user_password' => 'wrong-password',
         ]);
 
         $response->assertSessionHasErrors();
