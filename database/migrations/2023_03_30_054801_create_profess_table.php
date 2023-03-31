@@ -13,7 +13,7 @@ class CreateProfessTable extends Migration
      */
     public function up()
     {
-        Schema::create('profess', function (Blueprint $table) {
+        Schema::create('user_discipline', function (Blueprint $table) {
             $table->foreignId('user_id')
                 ->constrained('users');
             $table->foreignId('discipline_id')
@@ -30,6 +30,6 @@ class CreateProfessTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('profess');
+        Schema::dropIfExists('user_discipline');
     }
 }

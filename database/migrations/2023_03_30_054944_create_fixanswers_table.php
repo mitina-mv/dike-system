@@ -13,7 +13,7 @@ class CreateFixanswersTable extends Migration
      */
     public function up()
     {
-        Schema::create('fixanswers', function (Blueprint $table) {
+        Schema::create('answer_answerlog', function (Blueprint $table) {
             $table->foreignId('answer_id')
                 ->constrained('answers');
             $table->foreignId('answerlog_id')
@@ -30,6 +30,6 @@ class CreateFixanswersTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('fixanswers');
+        Schema::dropIfExists('answer_answerlog');
     }
 }

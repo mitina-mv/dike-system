@@ -13,7 +13,7 @@ class CreateTeachesTable extends Migration
      */
     public function up()
     {
-        Schema::create('teaches', function (Blueprint $table) {
+        Schema::create('user_studgroup', function (Blueprint $table) {
             $table->foreignId('user_id')
                 ->constrained('users');
             $table->foreignId('studgroup_id')
@@ -30,6 +30,6 @@ class CreateTeachesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('teaches');
+        Schema::dropIfExists('user_studgroup');
     }
 }
