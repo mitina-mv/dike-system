@@ -8,4 +8,19 @@ use Illuminate\Database\Eloquent\Model;
 class Test extends Model
 {
     use HasFactory;
+
+    public function user()
+    {
+        return $this->hasOne(User::class);
+    }
+
+    public function org()
+    {
+        return $this->hasOne(Org::class);
+    }
+
+    public function discipline()
+    {
+        return $this->hasOne(Discipline::class);
+    }
 }

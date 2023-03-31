@@ -8,4 +8,14 @@ use Illuminate\Database\Eloquent\Model;
 class Testlog extends Model
 {
     use HasFactory;
+    
+    public function user()
+    {
+        return $this->hasOne(User::class);
+    }
+
+    public function test()
+    {
+        return $this->hasOne(Test::class);
+    }
 }

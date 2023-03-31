@@ -8,4 +8,14 @@ use Illuminate\Database\Eloquent\Model;
 class Answer extends Model
 {
     use HasFactory;
+
+    public function answerlogs()
+    {
+        return $this->belongsToMany(Answerlog::class);
+    }
+
+    public function question()
+    {
+        return $this->hasOne(Question::class);
+    } 
 }

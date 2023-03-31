@@ -18,9 +18,11 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
-        'email',
-        'password',
+        'user_firstname',
+        'user_lastname',
+        'user_patronymic',
+        'user_email',
+        'user_password',
     ];
 
     /**
@@ -29,16 +31,32 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $hidden = [
-        'password',
+        'user_password',
         'remember_token',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-    ];
+    public function disciplines()
+    {
+        return $this->belongsToMany(Discipline::class);
+    }
+
+    public function studgroups()
+    {
+        return $this->belongsToMany(Studgroup::class);
+    }
+
+    public function org()
+    {
+        return $this->belongsTo(Org::class);
+    } 
+
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
+    } 
+
+    public function studgroup()
+    {
+        return $this->belongsTo(Studgroup::class);
+    } 
 }
