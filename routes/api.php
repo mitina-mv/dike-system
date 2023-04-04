@@ -3,6 +3,8 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\OrgController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -16,4 +18,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
+});
+
+Route::group(['prefix' => 'org'], function () {
+    Route::post('store', [OrgController::class, 'store'])->name('org.store');
+
 });

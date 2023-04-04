@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Org;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
@@ -20,7 +21,8 @@ class RegisteredUserController extends Controller
      */
     public function create()
     {
-        return view('auth.register');
+        $orgs = Org::all();
+        return view('auth.register', compact('orgs'));
     }
 
     /**
@@ -39,6 +41,7 @@ class RegisteredUserController extends Controller
             'patronymic' => ['string', 'max:255'],
             'user_email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'org_id' =>  ['required', 'integer']
         ]);
 
         $user = User::create([
@@ -48,7 +51,7 @@ class RegisteredUserController extends Controller
             'user_email' => $request->user_email,
             'user_password' => Hash::make($request->password),
             'role_id' => 1,
-            'org_id' => 1,
+            'org_id' => $request->org_id,
             'studgroup_id' => null
         ]);
 

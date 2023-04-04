@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\OrgController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -20,5 +22,9 @@ Route::get('/', function () {
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth'])->name('dashboard');
+
+
+Route::get('org', [OrgController::class, 'create'])->name('org.create');
+Route::post('org', [OrgController::class, 'store'])->name('org.store');
 
 require __DIR__.'/auth.php';
