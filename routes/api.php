@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\OrgController;
+use App\Http\Controllers\UsersController;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,7 +21,15 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::group(['prefix' => 'org'], function () {
-    Route::post('store', [OrgController::class, 'store'])->name('org.store');
+Route::group(['middleware' => ['auth']], function() {
+    
+    Route::group(['prefix' => 'org'], function () {
+        Route::post('store', [OrgController::class, 'store'])->name('org.store');
 
+    });
+    // add user by roles
+    Route::group(['prefix' => 'users'], function() {
+        Route::post('store', [UsersController::class, 'store'])->name('users.store');
+
+    });
 });

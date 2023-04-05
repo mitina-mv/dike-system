@@ -38,6 +38,7 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    // relationships
     public function disciplines()
     {
         return $this->belongsToMany(Discipline::class);
