@@ -34,11 +34,13 @@ Route::group(['prefix' => 'org'], function() {
 Route::group(['middleware' => ['auth']], function() {
     // add user by roles
     Route::group(['prefix' => 'users'], function() {
-        Route::get('/teacher', [UsersController::class, 'createTeacher'])->name('user.createTeacher');
-        Route::get('/student', [UsersController::class, 'createStudent'])->name('user.createStudent');
+        Route::get('teacher', [UsersController::class, 'createTeacher'])->name('user.createTeacher');
+        Route::get('student', [UsersController::class, 'createStudent'])->name('user.createStudent');
+        // Route::post('store', [UsersController::class, 'sss'])->name('users.sss');
+        Route::post('student', [UsersController::class, 'storeStudent'])->name('users.store_student');
 
     });
 });
-
+// 
 
 require __DIR__.'/auth.php';

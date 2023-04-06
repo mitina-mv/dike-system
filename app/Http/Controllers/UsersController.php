@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 use App\Http\Requests\UserAddRequest;
 
@@ -16,22 +17,29 @@ class UsersController extends Controller
 {
     public function createTeacher()
     {
-        return view('users.create');
+        $studgroups = Studgroup::select(['id', 'studgroup_name'])
+            ->where([
+                'org_id' => Auth::user()->org_id
+            ])
+            ->get();
+
+        return view('users.create_teacher', compact('studgroups'));
     }
 
     public function createStudent()
     {
         $studgroups = Studgroup::select(['id', 'studgroup_name'])
             ->where([
-                'org_id' => auth()->user->org_id
-            ]);
+                'org_id' => Auth::user()->org_id
+            ])
+            ->get();
 
-        return view('users.create', compact('studgroups'));
+        return view('users.create_student', compact('studgroups'));
     }
-
 
     public function storeTeacher(Request $request)
     {
+        dd($request);
         $this->store(
             $request, 
             [
@@ -45,29 +53,28 @@ class UsersController extends Controller
     public function storeStudent(Request $request)
     {
         $request->validate([
-            'studgroup_id' => ['request', 'integer'],
+            'items' => 'array|required',
+            'items.*.studgroup' => ['integer', 'required'],
+            'items.*.lastname' => ['required', 'string', 'max:255'],
+            'items.*.firstname' => ['required', 'string', 'max:255'],
+            'items.*.patronymic' => ['string', 'max:255'],
+            'items.*.user_email' => ['required', 'string', 'email', 'max:255', 'unique:users']
         ]);
 
-        $this->store(
-            $request, 
-            [
-                'studgroup' => $request['studgroup_id'],
-                'role' => 3
-            ]
-        );
-    }
+        foreach($request->items as $item)
+        {
+            User::create([
+                'user_firstname' => $item['firstname'],
+                'user_lastname' => $item['lastname'],
+                'user_patronymic' => $item['patronymic'] ?: null,
+                'user_email' => $item['user_email'],
+                'password' => Hash::make($item['user_email']),
+                'role_id' => 3,
+                'org_id' => Auth::user()->org_id,
+                'studgroup_id' => $item['studgroup']
+            ]);
+        }
 
-    private function store($request, $params)
-    {
-        User::create([
-            'user_firstname' => $request->firstname,
-            'user_lastname' => $request->lastname,
-            'user_patronymic' => $request->patronymic,
-            'user_email' => $request->user_email,
-            'user_password' => Hash::make($request->password),
-            'role_id' => $params['role'],
-            'org_id' => auth()->user->org_id,
-            'studgroup_id' => $params['studgroup']
-        ]);
+        return view('users.create_student');
     }
 }

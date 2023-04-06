@@ -27,9 +27,12 @@ Route::group(['middleware' => ['auth']], function() {
         Route::post('store', [OrgController::class, 'store'])->name('org.store');
 
     });
+
     // add user by roles
     Route::group(['prefix' => 'users'], function() {
-        Route::post('store', [UsersController::class, 'store'])->name('users.store');
+        Route::post('teacher', [UsersController::class, 'storeTeacher'])->name('users.store_teacher');
+        // Route::post('student', [UsersController::class, 'storeStudent'])->name('users.store_student');
+        // Route::post('store', [UsersController::class, 'sss'])->name('users.sss');
 
     });
 });

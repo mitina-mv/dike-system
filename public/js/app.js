@@ -8497,13 +8497,15 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  props: ['groups'],
   data: function data() {
     return {
       fields: [{
         surname: '',
         name: '',
         patronymic: '',
-        group: ''
+        group: '',
+        email: ''
       }]
     };
   },
@@ -8513,7 +8515,8 @@ __webpack_require__.r(__webpack_exports__);
         surname: '',
         name: '',
         patronymic: '',
-        group: ''
+        group: '',
+        email: ''
       });
     },
     removeField: function removeField(index) {
@@ -31501,7 +31504,10 @@ var render = function () {
                 expression: "field.surname",
               },
             ],
-            attrs: { placeholder: "Фамилия" },
+            attrs: {
+              placeholder: "Фамилия",
+              name: "items[" + index + "][lastname]",
+            },
             domProps: { value: field.surname },
             on: {
               input: function ($event) {
@@ -31522,7 +31528,10 @@ var render = function () {
                 expression: "field.name",
               },
             ],
-            attrs: { placeholder: "Имя" },
+            attrs: {
+              placeholder: "Имя",
+              name: "items[" + index + "][firstname]",
+            },
             domProps: { value: field.name },
             on: {
               input: function ($event) {
@@ -31543,7 +31552,10 @@ var render = function () {
                 expression: "field.patronymic",
               },
             ],
-            attrs: { placeholder: "Отчество" },
+            attrs: {
+              placeholder: "Отчество",
+              name: "items[" + index + "][patronymic]",
+            },
             domProps: { value: field.patronymic },
             on: {
               input: function ($event) {
@@ -31551,6 +31563,30 @@ var render = function () {
                   return
                 }
                 _vm.$set(field, "patronymic", $event.target.value)
+              },
+            },
+          }),
+          _vm._v(" "),
+          _c("input", {
+            directives: [
+              {
+                name: "model",
+                rawName: "v-model",
+                value: field.email,
+                expression: "field.email",
+              },
+            ],
+            attrs: {
+              placeholder: "Email",
+              name: "items[" + index + "][user_email]",
+            },
+            domProps: { value: field.email },
+            on: {
+              input: function ($event) {
+                if ($event.target.composing) {
+                  return
+                }
+                _vm.$set(field, "email", $event.target.value)
               },
             },
           }),
@@ -31566,6 +31602,7 @@ var render = function () {
                   expression: "field.group",
                 },
               ],
+              attrs: { name: "items[" + index + "][studgroup]" },
               on: {
                 change: function ($event) {
                   var $$selectedVal = Array.prototype.filter
@@ -31584,13 +31621,20 @@ var render = function () {
                 },
               },
             },
-            [
-              _c("option", { attrs: { value: "1" } }, [_vm._v("Группа 1")]),
-              _vm._v(" "),
-              _c("option", { attrs: { value: "2" } }, [_vm._v("Группа 2")]),
-              _vm._v(" "),
-              _c("option", { attrs: { value: "3" } }, [_vm._v("Группа 3")]),
-            ]
+            _vm._l(_vm.groups, function (group, igroup) {
+              return _c(
+                "option",
+                { key: igroup, domProps: { value: group.id } },
+                [
+                  _vm._v(
+                    "\n                " +
+                      _vm._s(group.studgroup_name) +
+                      "\n            "
+                  ),
+                ]
+              )
+            }),
+            0
           ),
           _vm._v(" "),
           _c(
@@ -31607,7 +31651,7 @@ var render = function () {
         ])
       }),
       _vm._v(" "),
-      _c("button", { on: { click: _vm.addField } }, [
+      _c("div", { on: { click: _vm.addField } }, [
         _vm._v("Добавить группу полей"),
       ]),
     ],

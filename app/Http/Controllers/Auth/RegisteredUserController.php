@@ -49,7 +49,7 @@ class RegisteredUserController extends Controller
             'user_lastname' => $request->lastname,
             'user_patronymic' => $request->patronymic,
             'user_email' => $request->user_email,
-            'user_password' => Hash::make($request->password),
+            'password' => Hash::make($request->password),
             'role_id' => 1,
             'org_id' => $request->org_id,
             'studgroup_id' => null
