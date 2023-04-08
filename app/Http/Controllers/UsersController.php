@@ -15,6 +15,11 @@ use App\Models\User;
 
 class UsersController extends Controller
 {
+    public function index()
+    {
+        return view('users.index');
+    }
+    
     public function createTeacher()
     {
         $studgroups = Studgroup::select(['id', 'studgroup_name'])
@@ -54,7 +59,8 @@ class UsersController extends Controller
     {
         $request->validate([
             'items' => 'array|required',
-            'items.*.studgroup' => ['integer', 'required'],
+            'items.*.studgroup' => ['array', 'required'],
+            'items.*.studgroup.*id' => ['integer', 'required'],
             'items.*.lastname' => ['required', 'string', 'max:255'],
             'items.*.firstname' => ['required', 'string', 'max:255'],
             'items.*.patronymic' => ['string', 'max:255'],
