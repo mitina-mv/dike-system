@@ -53,9 +53,12 @@ class UsersController extends Controller
             'org_id' => Auth::user()->org_id
         ])->get();
 
-        dd($teachers);
+        foreach($teachers as &$user)
+        {
+            $user['groups'] = $user->studgroups()->select('studgroup_name')->get()->all();
+        }
 
-        return view('users.index', compact('arGroupsStudent'));
+        return view('users.index', compact('arGroupsStudent', 'teachers'));
     }
     
     public function createTeacher()
@@ -92,10 +95,6 @@ class UsersController extends Controller
             'items.*.firstname' => ['required', 'string', 'max:255'],
             'items.*.patronymic' => ['string', 'max:255'],
             'items.*.user_email' => ['required', 'string', 'email', 'max:255', 'unique:users']
-        ],
-        [
-            'items.*.group.*id.integer' => 'Группы должны иметь числовой идентификатор. Обратитесь к разработчикам с этой проблемой.',
-            'items.*.user_email' => 'Необходим уникальный email'
         ]);
 
         try {
