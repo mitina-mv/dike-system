@@ -18,14 +18,26 @@ window.Vue = require('vue').default;
 
 // const files = require.context('./', true, /\.vue$/i)
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
+// import { library } from '@fortawesome/fontawesome-svg-core'
+// import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+// Vue.component('font-awesome-icon', FontAwesomeIcon);
 
 Vue.component(
     'example-component', 
     require('./components/ExampleComponent.vue').default
 );
 
+import TeacherForm from './components/TeacherForm.vue';
+Vue.component('teacher-form', TeacherForm);
+
 import StudentForm from './components/StudentForm.vue';
 Vue.component('student-form', StudentForm);
+
+import Multiselect from 'vue-multiselect'
+Vue.component('multiselect', Multiselect)
+
+import StudentList from './components/StudentList.vue'
+Vue.component('student-list', StudentList)
 
 // Vue.component(
 //     'student-form', 

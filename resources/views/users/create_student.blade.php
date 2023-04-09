@@ -7,7 +7,7 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
                 <!-- Validation Errors -->
                 <x-auth-validation-errors class="mb-4" :errors="$errors" />
 
@@ -18,7 +18,7 @@
                         <student-form :groups='@json($studgroups)'></student-form>
                     </div>
 
-                    <x-button class="ml-4">
+                    <x-button class="mt-3">
                         {{ __('Сохранить') }}
                     </x-button>
                 </form>

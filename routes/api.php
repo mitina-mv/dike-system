@@ -30,7 +30,7 @@ Route::group(['middleware' => ['auth']], function() {
 
     // add user by roles
     Route::group(['prefix' => 'users'], function() {
-        Route::post('teacher', [UsersController::class, 'storeTeacher'])->name('users.store_teacher');
+        // Route::post('teacher', [UsersController::class, 'storeTeacher'])->name('users.store_teacher');
         // Route::post('student', [UsersController::class, 'storeStudent'])->name('users.store_student');
         // Route::post('store', [UsersController::class, 'sss'])->name('users.sss');
 
