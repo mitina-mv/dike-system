@@ -22,7 +22,10 @@ class User extends Authenticatable
         'user_lastname',
         'user_patronymic',
         'user_email',
-        'user_password',
+        'password',
+        'role_id',
+        'org_id',
+        'studgroup_id'
     ];
 
     /**
@@ -31,10 +34,11 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $hidden = [
-        'user_password',
+        'password',
         'remember_token',
     ];
 
+    // relationships
     public function disciplines()
     {
         return $this->belongsToMany(Discipline::class);
@@ -42,7 +46,7 @@ class User extends Authenticatable
 
     public function studgroups()
     {
-        return $this->belongsToMany(Studgroup::class);
+        return $this->belongsToMany(Studgroup::class, 'user_studgroup');
     }
 
     public function org()
