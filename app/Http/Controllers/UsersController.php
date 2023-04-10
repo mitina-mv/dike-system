@@ -42,6 +42,7 @@ class UsersController extends Controller
             ];
         }
 
+        // get users by role 2
         $teachers = User::select([
             'id', 
             'user_firstname',
@@ -55,10 +56,22 @@ class UsersController extends Controller
 
         foreach($teachers as &$user)
         {
-            $user['groups'] = $user->studgroups()->select('studgroup_name')->get()->all();
+            $user['groups'] = implode(', ', 
+                array_column(
+                    $user->studgroups()->select('studgroup_name')->get()->all(),
+                    'studgroup_name'
+                )
+            );
         }
-
-        return view('users.index', compact('arGroupsStudent', 'teachers'));
+        
+        $teacherColumns = [
+            ['name' => 'ФИО', 'code' => 'user_firstname'],
+            ['name' => 'Email', 'code' => 'user_email'],
+            ['name' => 'Группы', 'code' => 'groups'],
+            ['name' => 'Действия', 'code' => 'buttons'],
+        ];
+        
+        return view('users.index', compact('arGroupsStudent', 'teachers', 'teacherColumns'));
     }
     
     public function createTeacher()
