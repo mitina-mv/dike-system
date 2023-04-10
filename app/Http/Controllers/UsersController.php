@@ -42,6 +42,7 @@ class UsersController extends Controller
             ];
         }
 
+        // get users by role 2
         $teachers = User::select([
             'id', 
             'user_firstname',
@@ -53,9 +54,24 @@ class UsersController extends Controller
             'org_id' => Auth::user()->org_id
         ])->get();
 
-        dd($teachers);
-
-        return view('users.index', compact('arGroupsStudent'));
+        foreach($teachers as &$user)
+        {
+            $user['groups'] = implode(', ', 
+                array_column(
+                    $user->studgroups()->select('studgroup_name')->get()->all(),
+                    'studgroup_name'
+                )
+            );
+        }
+        
+        $teacherColumns = [
+            ['name' => 'ФИО', 'code' => 'user_firstname'],
+            ['name' => 'Email', 'code' => 'user_email'],
+            ['name' => 'Группы', 'code' => 'groups'],
+            ['name' => 'Действия', 'code' => 'buttons'],
+        ];
+        
+        return view('users.index', compact('arGroupsStudent', 'teachers', 'teacherColumns'));
     }
     
     public function createTeacher()
@@ -92,10 +108,6 @@ class UsersController extends Controller
             'items.*.firstname' => ['required', 'string', 'max:255'],
             'items.*.patronymic' => ['string', 'max:255'],
             'items.*.user_email' => ['required', 'string', 'email', 'max:255', 'unique:users']
-        ],
-        [
-            'items.*.group.*id.integer' => 'Группы должны иметь числовой идентификатор. Обратитесь к разработчикам с этой проблемой.',
-            'items.*.user_email' => 'Необходим уникальный email'
         ]);
 
         try {

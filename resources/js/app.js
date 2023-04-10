@@ -30,6 +30,9 @@ Vue.component(
 import TeacherForm from './components/TeacherForm.vue';
 Vue.component('teacher-form', TeacherForm);
 
+import TableFilter from './components/TableFilter.vue';
+Vue.component('table-filter', TableFilter);
+
 import StudentForm from './components/StudentForm.vue';
 Vue.component('student-form', StudentForm);
 
@@ -57,3 +60,4 @@ const app = new Vue({
 import Alpine from 'alpinejs';
 window.Alpine = Alpine;
 Alpine.start();
+
