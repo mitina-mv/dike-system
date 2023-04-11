@@ -8611,10 +8611,12 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
-  props: ["groups"],
+  props: ["groups", 'addgroupurl'],
   data: function data() {
     return {
       currentGroup: 0,
@@ -8733,7 +8735,6 @@ function inArray(needle, haystack) {
   },
   computed: {
     sortIcon: function sortIcon() {
-      console.log(this.array);
       return this.sortAscending ? "fas fa-arrow-up" : "fas fa-arrow-down";
     }
   },
@@ -33035,26 +33036,37 @@ var render = function () {
       _c(
         "div",
         { staticClass: "mb-3 mt-3" },
-        _vm._l(_vm.groups, function (group, index) {
-          return _c(
-            "button",
-            {
-              key: group.id,
-              staticClass: "group-btn btn me-2",
-              class:
-                _vm.currentGroup == index
-                  ? "btn-secondary"
-                  : "btn-outline-secondary",
-              on: {
-                click: function ($event) {
-                  return _vm.changeGroup(index)
+        [
+          _vm._l(_vm.groups, function (group, index) {
+            return _c(
+              "button",
+              {
+                key: group.id,
+                staticClass: "group-btn btn me-2",
+                class:
+                  _vm.currentGroup == index
+                    ? "btn-secondary"
+                    : "btn-outline-secondary",
+                on: {
+                  click: function ($event) {
+                    return _vm.changeGroup(index)
+                  },
                 },
               },
+              [_vm._v("\n            " + _vm._s(group.name) + "\n        ")]
+            )
+          }),
+          _vm._v(" "),
+          _c(
+            "a",
+            {
+              staticClass: "btn btn-primary",
+              attrs: { href: _vm.addgroupurl },
             },
-            [_vm._v("\n            " + _vm._s(group.name) + "\n        ")]
-          )
-        }),
-        0
+            [_vm._v("+")]
+          ),
+        ],
+        2
       ),
       _vm._v(" "),
       _c("table-filter", {

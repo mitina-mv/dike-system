@@ -72,7 +72,6 @@ export default {
     },
     computed: {
         sortIcon() {
-            console.log(this.array);
             return this.sortAscending ? "fas fa-arrow-up" : "fas fa-arrow-down";
         },
     },

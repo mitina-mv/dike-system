@@ -32,6 +32,12 @@ Route::group(['prefix' => 'org'], function() {
 
 // 
 Route::group(['middleware' => ['auth']], function() {
+    // add student groups
+    Route::group(['prefix' => 'group'], function() {
+        Route::get('create', function(){
+            return 'ddd';
+        })->name('group.create');
+    });
     // add user by roles
     Route::group(['prefix' => 'users'], function() {
         Route::get('/', [UsersController::class, 'index'])->name('user.index');
