@@ -33063,7 +33063,7 @@ var render = function () {
               staticClass: "btn btn-primary",
               attrs: { href: _vm.addgroupurl },
             },
-            [_vm._v("+")]
+            [_vm._v("+ Создать группу")]
           ),
         ],
         2

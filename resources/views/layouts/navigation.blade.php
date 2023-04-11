@@ -16,7 +16,7 @@
                         {{ __('Dashboard') }}
                     </x-nav-link>
 
-                    <x-nav-link :href="route('user.index')" :active="request()->routeIs('user.index')">
+                    <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.index')">
                         {{ __('Пользователи') }}
                     </x-nav-link>
                 </div>
@@ -38,6 +38,10 @@
                     </x-slot>
 
                     <x-slot name="content">
+                        <x-dropdown-link href="{{ route('user.index') }}">
+                            {{ __('Профиль') }}
+                        </x-dropdown-link>
+
                         <!-- Authentication -->
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf

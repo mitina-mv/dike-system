@@ -15,7 +15,7 @@
                 {{ group.name }}
             </button>
 
-            <a :href="addgroupurl" class="btn btn-primary">+</a>
+            <a :href="addgroupurl" class="btn btn-primary">+ Создать группу</a>
         </div>
 
         <table-filter
