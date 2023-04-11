@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Список пользователей от организации') }}
+            {{ __('Список аккаунтов') }}
         </h2>
     </x-slot>
 
@@ -24,7 +24,10 @@
                         <div class="h4">Студенты</div>
                         <a href="{{ route('user.createStudent') }}" class="btn btn-success ml-2">Создать</a>
                     </div>
-                    <student-list :groups='@json($arGroupsStudent)'></student-list>
+                    <student-list 
+                        :groups='@json($arGroupsStudent)'
+                        :addGroupUrl="'{{ route('group.create') }}'"
+                    ></student-list>
 
                 </div>
             </div>

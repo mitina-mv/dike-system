@@ -14,6 +14,8 @@
             >
                 {{ group.name }}
             </button>
+
+            <a :href="addgroupurl" class="btn btn-primary">+</a>
         </div>
 
         <table-filter
@@ -29,7 +31,7 @@
 import TableFilter from './TableFilter.vue';
 
 export default {
-    props: ["groups"],
+    props: ["groups", 'addgroupurl'],
     data() {
         return {
             currentGroup: 0,
