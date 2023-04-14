@@ -20,7 +20,7 @@
 
         <table-filter
             :array="groups[currentGroup].students"
-            :url="'/user/'"
+            :url="'/profile/'"
             :addButtons="true"
             :columns="columnNames"
         ></table-filter>

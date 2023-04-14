@@ -33072,7 +33072,7 @@ var render = function () {
       _c("table-filter", {
         attrs: {
           array: _vm.groups[_vm.currentGroup].students,
-          url: "/user/",
+          url: "/profile/",
           addButtons: true,
           columns: _vm.columnNames,
         },

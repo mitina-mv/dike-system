@@ -16,7 +16,7 @@
                     <table-filter 
                         :array='@json($teachers)' 
                         :addButtons='{{true}}'
-                        :url="'/user/'"
+                        :url="'/profile/'"
                         :columns='@json($teacherColumns)'
                     ></table-filter>
 
