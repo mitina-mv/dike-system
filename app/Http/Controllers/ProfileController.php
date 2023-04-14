@@ -55,8 +55,40 @@ class ProfileController extends Controller
         return view('profile.index', compact('user', 'studgroups'));
     }
 
-    public function update(ProfileRequest $request, $id)
+    public function update(ProfileRequest $request)
     {
+        $user = User::find([$request->id])->first();
         dd($request);
+        // обновление пользователя
+        $updateDataUser = $request->validated();
+        unset($updateDataUser['groups']);
+        unset($updateDataUser['id']);
+        
+        if($user->update($updateDataUser))
+            return redirect(route('users.index'));
+        else {
+            $data['title'] = '302';
+            $data['message'] = 'Не удалось обновить пользователя';
+            $data['back_url'] = url()->previous();
+            return response()->view('errors.404', compact('data'), 404);
+        }
+
+        // обновление привязок по группам
+        /* if($request->groups) {
+            // generate primary keys
+            $keys = [];
+            foreach($item['group'] as $group)
+            {
+                $keys[]['key'] = $user->id . "_" . $group['id'];
+            }
+            
+            // add bind teacher_studgroup
+            $user->studgroups()->attach(
+                array_combine(
+                    array_column($item['group'], 'id'),
+                    $keys
+                )
+            );
+        } */
     }
 }

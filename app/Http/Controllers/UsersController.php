@@ -180,9 +180,4 @@ class UsersController extends Controller
 
         return view('users.index');
     }
-
-    public function update(User $user)
-    {
-        dd($user);
-    }
 }
