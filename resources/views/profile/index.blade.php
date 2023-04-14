@@ -14,7 +14,7 @@
                 <!-- Validation Errors -->
                 <x-auth-validation-errors class="mb-4" :errors="$errors" />
 
-                <form action="{{ route('profile.update', $user->id) }}" method="post">
+                <form action="{{ route('profile.update', $user->id) }}" method="post" class='dd'>
                     @csrf
 
                     <!-- user_lastname -->
@@ -65,9 +65,9 @@
                         </div>
                     @elseif($user->role_id == 2)
                         <div>
-                            <x-label for="studgroup_id" :value="__('Группы студентов')" />
+                            <x-label for="groups" :value="__('Группы студентов')" />
 
-                            <select name="studgroup_id" id="studgroup_id" class="rounded-md shadow-sm border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 block mt-1 w-full" required multiple>
+                            <select name="groups" id="groups" class="rounded-md shadow-sm border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 block mt-1 w-full" required multiple>
                                
                                 @foreach ($studgroups as $studgroup)
                                     <option 
