@@ -29,7 +29,7 @@
                 :taggable="true"
                 label="studgroup_name"
                 track-by="id"
-                tag-placeholder="Связанные группы"
+                placeholder="Связанные группы"
                 :name="'items[' + index + '][studgroup]'"
             ></multiselect>
 

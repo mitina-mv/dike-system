@@ -67,7 +67,26 @@
                         <div>
                             <x-label for="groups" :value="__('Группы студентов')" />
 
-                            <select name="groups" id="groups" class="rounded-md shadow-sm border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 block mt-1 w-full" required multiple>
+                            <div class="scroll-y">
+                                @foreach ($studgroups as $studgroup)
+                                <div>
+                                    <input 
+                                        type="checkbox" 
+                                        name="groups[]" 
+                                        id="{{ 'group' . $studgroup->id }}" 
+                                        value='{{ $studgroup->id }}'
+                                        @if (in_array($studgroup->id, $user['groups']))
+                                            checked
+                                        @endif
+                                    >
+                                    <label for="{{ 'group' . $studgroup->id }}">
+                                        {{ $studgroup->studgroup_name }}
+                                    </label>
+                                </div>
+                                @endforeach
+                            </div>
+
+                            {{-- <select name="groups" id="groups" class="rounded-md shadow-sm border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 block mt-1 w-full" required multiple>
                                
                                 @foreach ($studgroups as $studgroup)
                                     <option 
@@ -79,7 +98,7 @@
                                         {{ $studgroup->studgroup_name }}
                                     </option>
                                 @endforeach
-                            </select>
+                            </select> --}}
                         </div>
                     @endif
 

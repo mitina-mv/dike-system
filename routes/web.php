@@ -39,6 +39,7 @@ Route::group(['middleware' => ['auth']], function() {
             return 'ddd';
         })->name('group.create');
     });
+
     // profile
     Route::group(['prefix' => 'profile'], function() {
         Route::get('/{id}', [ProfileController::class, 'index'])->name('profile.index');
@@ -54,6 +55,8 @@ Route::group(['middleware' => ['auth']], function() {
         // Route::post('store', [UsersController::class, 'sss'])->name('users.sss');
         Route::post('student', [UsersController::class, 'storeStudent'])->name('users.store_student');
         Route::post('teacher', [UsersController::class, 'storeTeacher'])->name('users.store_teacher');
+
+        Route::delete('/{id}', [UsersController::class, 'destroy'])->name('users.delete');
 
     });
 });

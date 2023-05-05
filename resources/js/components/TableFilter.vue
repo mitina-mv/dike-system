@@ -95,7 +95,10 @@ export default {
             });
         },
         deleteItem(id) {
-            // Реализация функции удаления студента
+            axios.delete(`/users/${id}`)
+            .then(res => {
+                console.log(res);;
+            });
         },
     }
 

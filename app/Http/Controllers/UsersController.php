@@ -12,6 +12,7 @@ use App\Models\Role;
 use App\Models\Studgroup;
 use App\Models\User;
 use Exception;
+use Symfony\Component\HttpFoundation\Response;
 
 class UsersController extends Controller
 {
@@ -179,5 +180,22 @@ class UsersController extends Controller
         }
 
         return view('users.index');
+    }
+
+    public function destroy($id)
+    {
+        if($id != Auth::user()->id) {
+            $user = User::find($id);
+            $user->delete();
+        } else {
+            return response()->json([
+                'status' => 'error',
+                'message' => "Себя удалять нельзя"
+            ], Response::HTTP_BAD_REQUEST);
+        }
+    
+        return response()->json([
+            'message' => "Пользователь удален"
+        ], Response::HTTP_OK);
     }
 }

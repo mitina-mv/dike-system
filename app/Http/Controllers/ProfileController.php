@@ -58,7 +58,7 @@ class ProfileController extends Controller
     public function update(ProfileRequest $request)
     {
         $user = User::find([$request->id])->first();
-        dd($request);
+        // dd($request);
         // обновление пользователя
         $updateDataUser = $request->validated();
         unset($updateDataUser['groups']);
@@ -74,10 +74,10 @@ class ProfileController extends Controller
         }
 
         // обновление привязок по группам
-        /* if($request->groups) {
+        if($request->groups) {
             // generate primary keys
             $keys = [];
-            foreach($item['group'] as $group)
+            foreach($request->groups as $group)
             {
                 $keys[]['key'] = $user->id . "_" . $group['id'];
             }
@@ -85,10 +85,10 @@ class ProfileController extends Controller
             // add bind teacher_studgroup
             $user->studgroups()->attach(
                 array_combine(
-                    array_column($item['group'], 'id'),
+                    $request->groups,
                     $keys
                 )
             );
-        } */
+        }
     }
 }
