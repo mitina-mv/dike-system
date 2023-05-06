@@ -151,7 +151,9 @@ class UsersController extends Controller
 
         }
 
-        return response()->json(['message' => 'записи успешно добавлены'], 200);
+        return response()->json([
+            'message' => "Сохранение выполнено успешно"
+        ], Response::HTTP_CREATED);
     }
 
     public function storeStudent(Request $request)
@@ -179,14 +181,23 @@ class UsersController extends Controller
             ]);
         }
 
-        return view('users.index');
+        return response()->json([
+            'message' => "Сохранение выполнено успешно"
+        ], Response::HTTP_CREATED);
     }
 
     public function destroy($id)
     {
         if($id != Auth::user()->id) {
-            $user = User::find($id);
-            $user->delete();
+            try {
+                $user = User::find($id);
+                $user->delete();
+            } catch(Exception $e) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => "Ошибка при удалении. Возможно, пользователь был удален ранее. Попробуйде обновить страницу"
+                ], Response::HTTP_BAD_REQUEST);
+            }
         } else {
             return response()->json([
                 'status' => 'error',

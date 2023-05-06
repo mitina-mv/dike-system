@@ -45,22 +45,26 @@ class ProfileRequest extends FormRequest
             'user_lastname' => ['required', 'string', 'max:255'],
             'user_patronymic' => ['nullable', 'string', 'max:255'],
             'user_email' => ['required', 'string', 'email', 'max:255'],
-            'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
+            'password' => ['nullable', 'confirmed', Rules\Password::defaults(), 'min:8'],
             'studgroup_id' => ['nullable', 'integer'],
-            'groups' => ['nullable', 'array']
+            'groups' => ['nullable', 'array'],
+            'groups.*' => ['required', 'integer']
         ];
     }
 
-    /* public function messages()
+    public function messages()
     {
         return [
-            ''
+            'password.confirmed' => 'Пароли не совпадают. Введите снова.',
+            'password.min' => 'Минимальная длина пароля 8 символов',
+            'studgroup_id.integer' => 'Неудачно определена группа, попробуйдет снова',
+            'groups.*.integer' => 'Неудачно определены группы, попробуйдет снова'
         ];
-    } */
+    }
 
     protected function prepareForValidation()
     {
-        dd(request());
+        // dd(request());
         $this->merge([
             'id' => $this->route('id'),
         ]);

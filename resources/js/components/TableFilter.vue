@@ -97,15 +97,22 @@ export default {
         },
         deleteItem(id) {
             axios.delete(`/users/${id}`)
-            .then(res => {
-                this.$notify({
-                    title: 'Удаление пользователя',
-                    text: res.data.message,
-                    type: 'success',
-                });
-                let tr = document.querySelector(`#tr-${id}`);
-                tr.remove();
-            });
+                .then(res => {
+                    this.$notify({
+                        title: 'Удаление пользователя',
+                        text: res.data.message,
+                        type: 'success',
+                    });
+                    let tr = document.querySelector(`#tr-${id}`);
+                    tr.remove();
+                })
+                .catch(error => {
+                    this.$notify({
+                        title: 'Удаление пользователя',
+                        text: error.response.data.message,
+                        type: 'error',
+                    });
+                })
         },
     }
 

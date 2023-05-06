@@ -7,7 +7,10 @@ use App\Models\Studgroup;
 use Illuminate\Support\Facades\Auth;
 
 use App\Models\User;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Symfony\Component\HttpFoundation\Response;
 
 class ProfileController extends Controller
 {
@@ -58,37 +61,58 @@ class ProfileController extends Controller
     public function update(ProfileRequest $request)
     {
         $user = User::find([$request->id])->first();
-        // dd($request);
-        // обновление пользователя
-        $updateDataUser = $request->validated();
-        unset($updateDataUser['groups']);
-        unset($updateDataUser['id']);
-        
-        if($user->update($updateDataUser))
-            return redirect(route('users.index'));
-        else {
-            $data['title'] = '302';
-            $data['message'] = 'Не удалось обновить пользователя';
-            $data['back_url'] = url()->previous();
-            return response()->view('errors.404', compact('data'), 404);
-        }
+
 
         // обновление привязок по группам
         if($request->groups) {
             // generate primary keys
-            $keys = [];
+            $keys = array();
+            $i = 0;
             foreach($request->groups as $group)
             {
-                $keys[]['key'] = $user->id . "_" . $group['id'];
+                $keys[] = [
+                    'key' => $user->id . "_" . $group
+                ];
             }
             
             // add bind teacher_studgroup
-            $user->studgroups()->attach(
-                array_combine(
-                    $request->groups,
-                    $keys
-                )
-            );
+            // если привязка у
+            try {
+                $user->studgroups()->sync(
+                    array_combine(
+                        $request->groups,
+                        $keys
+                    )
+                );
+            } catch(Exception $e) {
+                return redirect()->route('profile.index', $user->id)->withInputs()->withErrors([
+                    'message' => 'Не удалось обновить пользователя. Попробуйте позже, ошибка уже в работе.'
+                ]);
+            }
         }
+
+        // обновление пользователя
+        $updateDataUser = $request->validated();
+        unset($updateDataUser['groups']);
+        unset($updateDataUser['id']);
+
+        if(isset($updateDataUser['password']) 
+            && $updateDataUser['password']
+        ) {
+            $updateDataUser['password'] = Hash::make($updateDataUser['password']);
+        } else {
+            unset($updateDataUser['password']);
+        }
+
+        try {
+            $user->update($updateDataUser);
+        } catch(Exception $e) {
+            return redirect()->route('profile.index', $user->id)->withErrors([
+                'message' => 'Не удалось обновить пользователя. Попробуйте позже, ошибка уже в работе.',
+                'error' => $e->getMessage()
+            ]);
+        }
+
+        return redirect()->route('profile.index', $user->id)->with('message', 'Успешно обновлено!');
     }
 }

@@ -8588,6 +8588,15 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
@@ -8858,6 +8867,12 @@ function inArray(needle, haystack) {
         });
         var tr = document.querySelector("#tr-".concat(id));
         tr.remove();
+      })["catch"](function (error) {
+        _this.$notify({
+          title: 'Удаление пользователя',
+          text: error.response.data.message,
+          type: 'error'
+        });
       });
     }
   }
@@ -33007,6 +33022,116 @@ var render = function () {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("div", [
+    _c("div", { staticClass: "d-flex" }, [
+      _c("input", {
+        directives: [
+          {
+            name: "model",
+            rawName: "v-model",
+            value: _vm.userData.user_lastname,
+            expression: "userData.user_lastname",
+          },
+        ],
+        staticClass: "form-control",
+        attrs: { placeholder: "Фамилия", name: "user_lastname" },
+        domProps: { value: _vm.userData.user_lastname },
+        on: {
+          input: function ($event) {
+            if ($event.target.composing) {
+              return
+            }
+            _vm.$set(_vm.userData, "user_lastname", $event.target.value)
+          },
+        },
+      }),
+      _vm._v(" "),
+      _c("input", {
+        directives: [
+          {
+            name: "model",
+            rawName: "v-model",
+            value: _vm.userData.user_firstname,
+            expression: "userData.user_firstname",
+          },
+        ],
+        staticClass: "form-control",
+        attrs: { placeholder: "Имя", name: "user_firstname" },
+        domProps: { value: _vm.userData.user_firstname },
+        on: {
+          input: function ($event) {
+            if ($event.target.composing) {
+              return
+            }
+            _vm.$set(_vm.userData, "user_firstname", $event.target.value)
+          },
+        },
+      }),
+      _vm._v(" "),
+      _c("input", {
+        directives: [
+          {
+            name: "model",
+            rawName: "v-model",
+            value: _vm.userData.user_patronymic,
+            expression: "userData.user_patronymic",
+          },
+        ],
+        staticClass: "form-control",
+        attrs: { placeholder: "Отчество", name: "user_patronymic" },
+        domProps: { value: _vm.userData.user_patronymic },
+        on: {
+          input: function ($event) {
+            if ($event.target.composing) {
+              return
+            }
+            _vm.$set(_vm.userData, "user_patronymic", $event.target.value)
+          },
+        },
+      }),
+      _vm._v(" "),
+      _c("input", {
+        directives: [
+          {
+            name: "model",
+            rawName: "v-model",
+            value: _vm.userData.user_email,
+            expression: "userData.user_email",
+          },
+        ],
+        staticClass: "form-control",
+        attrs: { placeholder: "Email", name: "user_email" },
+        domProps: { value: _vm.userData.user_email },
+        on: {
+          input: function ($event) {
+            if ($event.target.composing) {
+              return
+            }
+            _vm.$set(_vm.userData, "user_email", $event.target.value)
+          },
+        },
+      }),
+    ]),
+    _vm._v(" "),
+    _c(
+      "div",
+      [
+        _c("label", { staticClass: "typo__label" }, [_vm._v("Single select")]),
+        _vm._v(" "),
+        _c("multiselect", {
+          attrs: {
+            options: _vm.groups,
+            multiple: true,
+            taggable: true,
+            label: "studgroup_name",
+            "track-by": "id",
+            placeholder: "Связанные группы",
+            name: "groups",
+          },
+        }),
+      ],
+      1
+    ),
+    _vm._v(" "),
     _c(
       "div",
       {

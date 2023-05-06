@@ -1,43 +1,52 @@
 <template>
     <div>
-        <!-- <div class="d-fles">
+        <div class="d-flex">
             <input
                 v-model="userData.user_lastname"
                 placeholder="Фамилия"
-                :name="'items[' + index + '][lastname]'"
+                name="user_lastname"
                 class="form-control"
             />
             <input
                 v-model="userData.user_firstname"
                 placeholder="Имя"
-                :name="'items[' + index + '][firstname]'"
+                name="user_firstname"
                 class="form-control"
             />
             <input
                 v-model="userData.user_patronymic"
                 placeholder="Отчество"
-                :name="'items[' + index + '][patronymic]'"
+                name="user_patronymic"
                 class="form-control"
             />
             <input
                 v-model="userData.user_email"
                 placeholder="Email"
-                :name="'items[' + index + '][user_email]'"
+                name="user_email"
                 class="form-control"
             />
         </div>
 
         <div>
             <label class="typo__label">Single select</label>
-            <multiselect
+            <!-- <multiselect
                 v-model="value"
                 :options="options"
                 :searchable="false"
                 :close-on-select="false"
                 :show-labels="false"
                 placeholder="Pick a value"
+            ></multiselect> -->
+            <multiselect
+                :options="groups"
+                :multiple="true"
+                :taggable="true"
+                label="studgroup_name"
+                track-by="id"
+                placeholder="Связанные группы"
+                name="groups"
             ></multiselect>
-        </div> -->
+        </div>
 
         <div class="ddd" @click="log()">yf;vb</div>
     </div>
