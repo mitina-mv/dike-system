@@ -16,6 +16,8 @@
 
                     <div id="app">
                         <student-form :groups='@json($studgroups)'></student-form>
+
+                        <notifications/>
                     </div>
 
                     <x-button class="mt-3">

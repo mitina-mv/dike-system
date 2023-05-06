@@ -11,24 +11,25 @@
                 <div id="app">
                     <div class="caption d-flex mb-3">
                         <div class="h4">Преподаватели</div>
-                        <a href="{{ route('user.createTeacher') }}" class="btn btn-success ml-2">Создать</a>
+                        <a href="{{ route('users.createTeacher') }}" class="btn btn-success ml-2">Создать</a>
                     </div>
                     <table-filter 
                         :array='@json($teachers)' 
                         :addButtons='{{true}}'
-                        :url="'/user/'"
+                        :url="'/profile/'"
                         :columns='@json($teacherColumns)'
                     ></table-filter>
 
                     <div class="caption d-flex mt-3 mb-3">
                         <div class="h4">Студенты</div>
-                        <a href="{{ route('user.createStudent') }}" class="btn btn-success ml-2">Создать</a>
+                        <a href="{{ route('users.createStudent') }}" class="btn btn-success ml-2">Создать</a>
                     </div>
                     <student-list 
                         :groups='@json($arGroupsStudent)'
                         :addGroupUrl="'{{ route('group.create') }}'"
                     ></student-list>
 
+                    <notifications/>
                 </div>
             </div>
         </div>

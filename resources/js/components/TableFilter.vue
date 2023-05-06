@@ -22,6 +22,7 @@
                 <tr
                     v-for="item in array"
                     :key="item.id"
+                    :id="`tr-${item.id}`"
                 >
                     <td v-for="column in columns" :key="column.code">
                         <span v-if="column.code == 'user_firstname'">
@@ -95,7 +96,23 @@ export default {
             });
         },
         deleteItem(id) {
-            // Реализация функции удаления студента
+            axios.delete(`/users/${id}`)
+                .then(res => {
+                    this.$notify({
+                        title: 'Удаление пользователя',
+                        text: res.data.message,
+                        type: 'success',
+                    });
+                    let tr = document.querySelector(`#tr-${id}`);
+                    tr.remove();
+                })
+                .catch(error => {
+                    this.$notify({
+                        title: 'Удаление пользователя',
+                        text: error.response.data.message,
+                        type: 'error',
+                    });
+                })
         },
     }
 

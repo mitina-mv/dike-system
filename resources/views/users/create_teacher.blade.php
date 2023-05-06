@@ -16,6 +16,8 @@
 
                     <div id="app">
                         <teacher-form :groups='@json($studgroups)'></teacher-form>
+                        
+                        <notifications/>
                     </div>
                 </form>
             </div>

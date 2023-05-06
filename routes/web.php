@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\OrgController;
 use App\Http\Controllers\UsersController;
+use App\Http\Controllers\ProfileController;
 
 /*
 |--------------------------------------------------------------------------
@@ -38,15 +39,24 @@ Route::group(['middleware' => ['auth']], function() {
             return 'ddd';
         })->name('group.create');
     });
+
+    // profile
+    Route::group(['prefix' => 'profile'], function() {
+        Route::get('/{id}', [ProfileController::class, 'index'])->name('profile.index');
+        Route::post('/{id}', [ProfileController::class, 'update'])->name('profile.update');
+    });
+    
     // add user by roles
     Route::group(['prefix' => 'users'], function() {
-        Route::get('/', [UsersController::class, 'index'])->name('user.index');
+        Route::get('/', [UsersController::class, 'index'])->name('users.index');
 
-        Route::get('teacher', [UsersController::class, 'createTeacher'])->name('user.createTeacher');
-        Route::get('student', [UsersController::class, 'createStudent'])->name('user.createStudent');
+        Route::get('teacher', [UsersController::class, 'createTeacher'])->name('users.createTeacher');
+        Route::get('student', [UsersController::class, 'createStudent'])->name('users.createStudent');
         // Route::post('store', [UsersController::class, 'sss'])->name('users.sss');
         Route::post('student', [UsersController::class, 'storeStudent'])->name('users.store_student');
         Route::post('teacher', [UsersController::class, 'storeTeacher'])->name('users.store_teacher');
+
+        Route::delete('/{id}', [UsersController::class, 'destroy'])->name('users.delete');
 
     });
 });

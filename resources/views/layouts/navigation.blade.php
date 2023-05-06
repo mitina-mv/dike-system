@@ -1,3 +1,7 @@
+@php
+    use Illuminate\Support\Facades\Auth;    
+@endphp
+
 <nav x-data="{ open: false }" class="bg-white border-b border-gray-100">
     <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -16,7 +20,7 @@
                         {{ __('Dashboard') }}
                     </x-nav-link>
 
-                    <x-nav-link :href="route('user.index')" :active="request()->routeIs('user.index')">
+                    <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.index')">
                         {{ __('Пользователи') }}
                     </x-nav-link>
                 </div>
@@ -38,6 +42,10 @@
                     </x-slot>
 
                     <x-slot name="content">
+                        <x-dropdown-link href="{{ route('profile.index', Auth::id()) }}">
+                            {{ __('Профиль') }}
+                        </x-dropdown-link>
+
                         <!-- Authentication -->
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf

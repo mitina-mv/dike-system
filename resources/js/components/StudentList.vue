@@ -15,12 +15,12 @@
                 {{ group.name }}
             </button>
 
-            <a :href="addgroupurl" class="btn btn-primary">+</a>
+            <a :href="addgroupurl" class="btn btn-primary">+ Создать группу</a>
         </div>
 
         <table-filter
             :array="groups[currentGroup].students"
-            :url="'/user/'"
+            :url="'/profile/'"
             :addButtons="true"
             :columns="columnNames"
         ></table-filter>
