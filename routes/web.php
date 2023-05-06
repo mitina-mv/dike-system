@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\OrgController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\QuestionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -57,6 +58,13 @@ Route::group(['middleware' => ['auth']], function() {
         Route::post('teacher', [UsersController::class, 'storeTeacher'])->name('users.store_teacher');
 
         Route::delete('/{id}', [UsersController::class, 'destroy'])->name('users.delete');
+
+    });
+
+    // question CRUD
+    Route::group(['prefix' => 'question'], function() {
+        Route::get('/', [QuestionController::class, 'index'])->name('question.index');
+        
 
     });
 });
