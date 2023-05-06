@@ -44,9 +44,6 @@ Vue.component('multiselect', Multiselect)
 import StudentList from './components/StudentList.vue'
 Vue.component('student-list', StudentList)
 
-import ProfileForm from './components/ProfileForm.vue'
-Vue.component('profile-form', ProfileForm)
-
 // Vue.component(
 //     'student-form', 
 //     require('./components/StudentForm.vue')

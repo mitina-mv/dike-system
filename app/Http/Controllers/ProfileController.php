@@ -3,14 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileRequest;
-use App\Models\Studgroup;
 use Illuminate\Support\Facades\Auth;
 
 use App\Models\User;
+use App\Models\Studgroup;
+
 use Exception;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Symfony\Component\HttpFoundation\Response;
 
 class ProfileController extends Controller
 {
