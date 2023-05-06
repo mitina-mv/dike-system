@@ -22,6 +22,7 @@
                 <tr
                     v-for="item in array"
                     :key="item.id"
+                    :id="`tr-${item.id}`"
                 >
                     <td v-for="column in columns" :key="column.code">
                         <span v-if="column.code == 'user_firstname'">
@@ -97,7 +98,13 @@ export default {
         deleteItem(id) {
             axios.delete(`/users/${id}`)
             .then(res => {
-                console.log(res);;
+                this.$notify({
+                    title: 'Удаление пользователя',
+                    text: res.data.message,
+                    type: 'success',
+                });
+                let tr = document.querySelector(`#tr-${id}`);
+                tr.remove();
             });
         },
     }

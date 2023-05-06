@@ -29,6 +29,7 @@
                         :addGroupUrl="'{{ route('group.create') }}'"
                     ></student-list>
 
+                    <notifications/>
                 </div>
             </div>
         </div>
