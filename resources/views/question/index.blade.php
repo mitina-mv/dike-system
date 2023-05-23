@@ -19,6 +19,23 @@
                         :discipline='@json($discipline)'
                     ></question-list>
 
+                    @php
+                        $options = [
+                            'columns'=> [[
+                                'title' =>  'Текст вопроса',
+                                'field' =>  'question_text',
+                                'sorter' =>  'string',
+                                'headerFilter' => true
+                            ],[
+                                'title' =>  'Привaтность',
+                                'field' =>  'question_private',
+                                'formatter' => "tickCross"
+                            ], 
+                        ]
+                    ];
+                    @endphp
+                    {{-- <VueTabulator v-model="@json($questions)" :options="@json($options)" /> --}}
+                    {{-- <tabulator-table/> --}}
                     <notifications/>
                 </div>
             @endif
