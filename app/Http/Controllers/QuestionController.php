@@ -7,7 +7,8 @@ use App\Models\Question;
 use App\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-
+use Symfony\Component\HttpFoundation\Response;
+use Exception;
 class QuestionController extends Controller
 {
     private function checkRules() 
@@ -52,11 +53,73 @@ class QuestionController extends Controller
                 $questions[$question->discipline_id][] = $question;
             }
 
+            // удаление дисциплин, на которые нет вопросов
+            foreach($discipline as $key => $d)
+            {
+                if(!isset($questions[$d->id])) 
+                    unset($discipline[$key]);
+            }
+
             return view('question.index', compact('questions', 'discipline'));
 
         } else {
             $error = 'Вы не имеете достаточных прав на это действие';
             return view('question.index', compact('error'));
+        }
+    }
+
+    public function formCreate()
+    {
+        # code...
+    }
+
+    // get data for edit form
+    public function read()
+    {
+        # code...
+    }
+
+    public function create()
+    {
+        # code...
+    }
+
+    public function update()
+    {
+        # code...
+    }
+
+    public function destroy($id)
+    {
+        if($this->checkRules())
+        {
+            try {
+                $question = Question::find($id);
+
+                if($question->user_id == Auth::user()->id)
+                {
+                    $question->delete();
+                } else {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => "Вы не имеете право удаления этого вопроса."
+                    ], Response::HTTP_BAD_REQUEST);
+                }
+            } catch(Exception $e) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => "Ошибка при удалении. Возможно, вопрос был удален ранее. Обновите страницу."
+                ], Response::HTTP_BAD_REQUEST);
+            }
+
+            return response()->json([
+                'message' => "Вопрос удален"
+            ], Response::HTTP_OK);
+        } else {
+            return response()->json([
+                'status' => 'error',
+                'message' => "Вы не имеете право удаления этого вопроса."
+            ], Response::HTTP_BAD_REQUEST);
         }
     }
 }

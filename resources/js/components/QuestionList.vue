@@ -15,21 +15,20 @@
                 {{ disc.discipline_name }}
             </button>
 
-            <a href="/question/create" class="btn btn-primary">+ Добавить дисциплину</a>
+            <a href="/discipline/" class="btn btn-primary">+ Добавить дисциплину</a>
         </div>
-
+        <a href="/questions/create" class="btn btn-success">+ Создать вопрос</a>
         <VueTabulator v-model="questions[currentDiscipline]" :options="options" />
     </div>
 </template>
 
 <script>
-import { functions } from 'lodash';
 export default {
     props: ["questions", 'discipline'],
     data() {
         return {
             currentDiscipline: 1,
-            url: '/question/',
+            url: '/question',
             options: {
                 columns: [
                     {
@@ -45,10 +44,10 @@ export default {
                         width: 130
                     }, 
                     {
-                        formatter: function(cell) {
+                        formatter: (cell) => {
                             let data = cell.getRow().getData();
                             return `<a
-                                href="/question/${data.id}"
+                                href="${this.url}/${data.id}"
                                 class="btn btn-outline-success"
                             >
                                 Редактировать
@@ -73,7 +72,7 @@ export default {
                         cellClick: (e, cell) => {
                             let data = cell.getRow().getData();
 
-                            axios.delete(`/question/${data.id}`)
+                            axios.delete(`${this.url}/${data.id}`)
                                 .then(res => {
                                     this.$notify({
                                         title: 'Удаление вопроса',
@@ -95,24 +94,6 @@ export default {
                 layout:"fitColumns",
                 height:"auto",
             },
-            // columnNames: [
-            //     {
-            //         name: "Текст вопроса",
-            //         code: "question_text",
-            //         type: 'text'
-            //     },
-            //     {
-            //         name: "Привaтность",
-            //         code: "question_private",
-            //         type: 'checkbox'
-            //     },
-            //     {
-            //         name: "Действия",
-            //         code: "buttons",
-            //     },
-            // ],
-            currentSortColumn: "",
-            sortAscending: true,
         };
     },
     methods: {
@@ -125,4 +106,8 @@ export default {
 
 <style lang='scss'>
 @import "~vue-tabulator/dist/scss/tabulator_simple.scss";
+.tabulator-row.tabulator-selectable:hover {
+    background-color: #ecf1ff;
+    cursor: pointer;
+}
 </style>
