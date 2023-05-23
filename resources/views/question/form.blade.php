@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Банк заданий') }}
+            {{ $title }}
         </h2>
     </x-slot>
 
@@ -13,18 +13,14 @@
             @if (isset($error))
                 <?= $error?>
             @else
-                <div id="app">
-                    <question-list
-                        :questions='@json($questions)'
-                        :discipline='@json($discipline)'
-                    ></question-list>
-                    
+                <div id="app"> 
+                    <question-form/>
                     <notifications/>
                 </div>
-            @endif
+                    @endif
 
             </div>
         </div>
     </div>
-
-</x-app-layout>
+    
+    </x-app-layout>

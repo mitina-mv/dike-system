@@ -17,7 +17,7 @@
 
             <a href="/discipline/" class="btn btn-primary">+ Добавить дисциплину</a>
         </div>
-        <a href="/questions/create" class="btn btn-success">+ Создать вопрос</a>
+        <a href="/question/create" class="btn btn-success">+ Создать вопрос</a>
         <VueTabulator v-model="questions[currentDiscipline]" :options="options" />
     </div>
 </template>

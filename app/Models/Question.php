@@ -8,6 +8,15 @@ use Illuminate\Database\Eloquent\Model;
 class Question extends Model
 {
     use HasFactory;
+    
+    protected $fillable = [
+        'question_private',
+        'question_text',
+        'question_settings',
+        'org_id',
+        'user_id',
+        'discipline_id',
+    ];
         
     public function user()
     {

@@ -11,7 +11,7 @@ import Notifications from 'vue-notification'
 Vue.use(Notifications)
 
 import VueTabulator from 'vue-tabulator';
-Vue.component('VueTabulator', VueTabulator);
+// Vue.component('VueTabulator', VueTabulator);
 
 Vue.use(VueTabulator);
 /**
@@ -48,16 +48,12 @@ Vue.component('multiselect', Multiselect)
 import StudentList from './components/StudentList.vue'
 Vue.component('student-list', StudentList)
 
-import QuestionList from './components/QuestionList.vue'
+import QuestionList from './components/questions/QuestionList.vue'
 Vue.component('question-list', QuestionList)
 
-import TabulatorTable from './components/TabulatorTable.vue'
-Vue.component('tabulator-table', TabulatorTable)
+import QuestionForm from './components/questions/QuestionForm.vue'
+Vue.component('question-form', QuestionForm)
 
-// Vue.component(
-//     'student-form', 
-//     require('./components/StudentForm.vue')
-// );
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to

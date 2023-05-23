@@ -70,13 +70,44 @@ class QuestionController extends Controller
 
     public function formCreate()
     {
-        # code...
+        if($this->checkRules())
+        {
+            $title = 'Добавление вопроса';
+            $discipline = Discipline::orderBy('discipline_name', 'asc')->get()->all();
+            
+            return view('question.form', compact('title', 'discipline'));
+        } else {
+            $error = 'Вы не имеете достаточных прав на это действие';
+            return view('question.index', compact('error'));
+        }
     }
 
     // get data for edit form
-    public function read()
+    public function read($id)
     {
-        # code...
+        if($this->checkRules())
+        {
+            $discipline = Discipline::orderBy('discipline_name', 'asc')->get()->all();
+            $title = 'Редактирование вопроса';
+
+            $user = Auth::user();
+            
+            $question = Question::where([
+                'id' => $id,
+                'org_id' => $user->org_id,
+                // 'user_id' => $user->id
+            ])->first();
+
+            if(!empty($question))
+                return view('question.form', compact('title', 'discipline'));
+            else {
+                $error = 'Вы не имеете достаточных прав на это действие';
+                return view('question.index', compact('error')); 
+            }
+        } else {
+            $error = 'Вы не имеете достаточных прав на это действие';
+            return view('question.index', compact('error'));
+        }
     }
 
     public function create()
