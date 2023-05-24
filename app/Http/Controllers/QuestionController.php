@@ -141,48 +141,7 @@ class QuestionController extends Controller
             // добавление ответов
             foreach($request->answers as $reqAns)
             {
-                // если новый и сразу удалили 
-                if($reqAns['id'] == "__new" && $reqAns['isDelete'] == true)
-                    continue;
-
-                // если не новый и удалили
-                if(is_numeric($reqAns['id']) && $reqAns['isDelete'] == true)
-                {
-                    try {
-                        $answer = Answer::find($reqAns['id']);
-                        if(isset($answer))
-                            $answer->delete();
-                    } catch(Exception $e) {
-                        // return response()->json([
-                        //     'status' => 'error',
-                        //     'message' => "Ошибка при удалении"
-                        // ], Response::HTTP_BAD_REQUEST);
-                    }
-
-                    continue;
-                }
-
-                if(is_numeric($reqAns['id']))
-                {
-                    $answer = Answer::find($reqAns['id']);
-                    $answer->update([
-                        'answer_name' => $reqAns['text'],
-                        'answer_status' => $reqAns['isCorrect'],
-                        'question_id' => $question->id,
-                    ]);
-
-                    continue;
-                }
-
-                if($reqAns['id'] == '__new')
-                {
-                    $answer = Answer::create([
-                        'answer_name' => $reqAns['text'],
-                        'answer_status' => $reqAns['isCorrect'],
-                        'question_id' => $question->id,
-                    ]);
-                    continue;
-                }
+                $this->answerService($reqAns, $question);
             }
 
             return response()->json([
@@ -196,9 +155,31 @@ class QuestionController extends Controller
         }
     }
 
-    public function update()
+    public function update(QuestionCreateRequest $request, $id)
     {
-        # code...
+        if($this->checkRules())
+        {
+            $user = Auth::user();
+            $question = Question::find($id);
+            $question->update([
+                "question_text" => $request->name,
+                "question_private" => $request->private,
+                "discipline_id" => $request->discipline,
+                "mark" => $request->mark,
+                "question_settings" => json_encode([ // TODO расширить (?)
+                    'type' => $request->type,
+                ])
+            ]);
+            
+            return response()->json([
+                'message' => "Сохранено"
+            ], Response::HTTP_OK);
+        } else {
+            return response()->json([
+                'status' => 'error',
+                'message' => "Вы не имеете право редактирование вопроса"
+            ], Response::HTTP_BAD_REQUEST);
+        }
     }
 
     public function destroy($id)
@@ -232,6 +213,52 @@ class QuestionController extends Controller
                 'status' => 'error',
                 'message' => "Вы не имеете право удаления этого вопроса."
             ], Response::HTTP_BAD_REQUEST);
+        }
+    }
+
+    public function answerService($answer, $question)
+    {
+        // если новый и сразу удалили 
+        if($answer['id'] == "__new" && $answer['isDelete'] == true)
+            return;
+
+        // если не новый и удалили
+        if(is_numeric($answer['id']) && $answer['isDelete'] == true)
+        {
+            try {
+                $answer = Answer::find($answer['id']);
+                if(isset($answer))
+                    $answer->delete();
+            } catch(Exception $e) {
+                // return response()->json([
+                //     'status' => 'error',
+                //     'message' => "Ошибка при удалении"
+                // ], Response::HTTP_BAD_REQUEST);
+            }
+
+            return;
+        }
+
+        if(is_numeric($answer['id']))
+        {
+            $answer = Answer::find($answer['id']);
+            $answer->update([
+                'answer_name' => $answer['text'],
+                'answer_status' => $answer['isCorrect'],
+                'question_id' => $question->id,
+            ]);
+
+            return;
+        }
+
+        if($answer['id'] == '__new')
+        {
+            $answer = Answer::create([
+                'answer_name' => $answer['text'],
+                'answer_status' => $answer['isCorrect'],
+                'question_id' => $question->id,
+            ]);
+            return;
         }
     }
 }
