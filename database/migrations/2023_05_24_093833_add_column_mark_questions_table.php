@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddColumnCodeDisciplineTable extends Migration
+class AddColumnMarkQuestionsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,9 @@ class AddColumnCodeDisciplineTable extends Migration
      */
     public function up()
     {
-        Schema::table('disciplines', function (Blueprint $table) {
-            $table->string('code')->nullable()->unique();
+        Schema::table('questions', function (Blueprint $table) {
+            $table->double('mark')
+                ->nullable();
         });
     }
 
@@ -25,8 +26,8 @@ class AddColumnCodeDisciplineTable extends Migration
      */
     public function down()
     {
-        Schema::table('disciplines', function (Blueprint $table) {
-            $table->dropColumn('code');
+        Schema::table('questions', function (Blueprint $table) {
+            $table->dropColumn('mark');
         });
     }
 }

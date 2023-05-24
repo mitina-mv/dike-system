@@ -8890,6 +8890,38 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+/* harmony import */ var vue_multiselect__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue-multiselect */ "./node_modules/vue-multiselect/dist/vue-multiselect.min.js");
+/* harmony import */ var vue_multiselect__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vue_multiselect__WEBPACK_IMPORTED_MODULE_0__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -8981,13 +9013,25 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 
+
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  props: {
+    disciplines: {
+      type: Array,
+      required: true
+    },
+    question: {
+      type: Array,
+      required: false
+    }
+  },
   data: function data() {
     return {
       name: "",
       privateCheck: false,
       type: "single",
-      disciplines: [],
+      disciplinesAdd: [],
+      errorText: null,
       types: [{
         name: "Одиночный выбор",
         code: "single"
@@ -9000,16 +9044,64 @@ __webpack_require__.r(__webpack_exports__);
       }],
       answers: [{
         text: "",
-        isCorrect: false
+        isCorrect: true,
+        isDelete: false,
+        id: "__new"
       }]
     };
   },
+  components: {
+    Multiselect: (vue_multiselect__WEBPACK_IMPORTED_MODULE_0___default())
+  },
+  computed: {},
   methods: {
     addAnswer: function addAnswer() {
-      this.answers.push({
-        text: "",
-        isCorrect: false
+      if (this.type == 'text') {
+        this.answers.push({
+          text: "",
+          isCorrect: true,
+          isDelete: false,
+          id: "__new"
+        });
+      } else {
+        this.answers.push({
+          text: "",
+          isCorrect: false,
+          isDelete: false,
+          id: "__new"
+        });
+      }
+    },
+    send: function send() {
+      var _this = this;
+      this.name = this.name.replace(/\s+/g, " ");
+
+      // проверка наличия данных
+      if (!this.name || !this.disciplinesAdd || !this.type || !this.answers) {
+        this.errorText = 'Введите все обязательные поля: текст вопроса, тип, дисциплины. Проверьте ввод ответов.';
+      }
+
+      // проверка наличия правильного ответа
+      var flagCorrectAnswer = false;
+      var countSimpleCorrectAnswer = 0;
+      this.answers.forEach(function (item) {
+        if (item.isCorrect == true && item.isDelete !== true) {
+          flagCorrectAnswer = true;
+          if (_this.type == 'simple') {
+            ++countSimpleCorrectAnswer;
+          }
+        }
       });
+      if (!flagCorrectAnswer) {
+        this.errorText = 'Выберите хотя бы один правильный ответ среди тех, которые не удаляются';
+      }
+      if (countSimpleCorrectAnswer != 1) {
+        this.errorText = 'Для одиночного выбора нужно ввести только один правильный ответ';
+      }
+    },
+    getDeleteClass: function getDeleteClass(index) {
+      return this.answers[index].isDelete ? "answer-item_delete" : "";
+      // return 'answer-item_delete' + index
     }
   }
 });
@@ -14581,7 +14673,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.answer-item[data-v-7ba1d977]{\r\n    padding: 1em;\n}\n.answer-item[data-v-7ba1d977]:nth-child(2n) {\r\n    background: #ebeefe;\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.answer-item[data-v-7ba1d977] {\r\n    padding: 1em;\n}\n.answer-item[data-v-7ba1d977]:nth-child(2n) {\r\n    background: #ebeefe;\n}\n.answer-item_delete[data-v-7ba1d977] {\r\n    background: #ffdbdb !important;\n}\n.answer-item_delete[data-v-7ba1d977]:before {\r\n    content: \"Будет удалено!\";\r\n    color: #fff;\r\n    font-weight: 800;\r\n    background: var(--bs-red);\r\n    padding: 4px 10px;\r\n    margin-bottom: 10px;\r\n    display: block;\n}\n.answer-body[data-v-7ba1d977] {\r\n    list-style-type: none;\r\n    counter-reset: css-counter 0;\n}\n.answer-body .answer-item[data-v-7ba1d977] {\r\n    counter-increment: css-counter 1;\r\n    position: relative;\n}\n.answer-body .answer-item[data-v-7ba1d977]:after {\r\n    content: counter(css-counter);\r\n    background: #fff;\r\n    color: var(--bs-indigo);\r\n    border: 2px solid var(--bs-indigo);\r\n    border-radius: 50%;\r\n    display: flex;\r\n    width: 30px;\r\n    height: 30px;\r\n    text-align: center;\r\n    font-weight: 700;\r\n    position: absolute;\r\n    align-items: center;\r\n    justify-content: center;\r\n    top: -5px;\r\n    right: -14px;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -57345,299 +57437,375 @@ var render = function () {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c(
-    "div",
-    [
-      _c("div", { staticClass: "question-title form-group" }, [
-        _c("label", { attrs: { for: "" } }, [_vm._v("Текст вопроса")]),
-        _vm._v(" "),
-        _c("input", {
-          directives: [
-            {
-              name: "model",
-              rawName: "v-model",
-              value: _vm.name,
-              expression: "name",
-            },
-          ],
-          staticClass: "form-control",
-          attrs: {
-            type: "text",
-            id: "question_text",
-            "aria-describedby": "question_text_help",
-            placeholder: "Новый вопрос",
-          },
-          domProps: { value: _vm.name },
-          on: {
-            input: function ($event) {
-              if ($event.target.composing) {
-                return
-              }
-              _vm.name = $event.target.value
-            },
-          },
-        }),
-        _vm._v(" "),
-        _c(
-          "small",
+  return _c("div", [
+    _c(
+      "div",
+      {
+        directives: [
           {
-            staticClass: "form-text text-muted",
-            attrs: { id: "question_text_help" },
+            name: "show",
+            rawName: "v-show",
+            value: _vm.errorText,
+            expression: "errorText",
           },
-          [_vm._v("Не более 510 символов")]
-        ),
-      ]),
+        ],
+        staticClass: "alert alert-danger mt-3 mb-3",
+        attrs: { role: "alert" },
+      },
+      [_vm._v("\n        " + _vm._s(_vm.errorText) + "\n    ")]
+    ),
+    _vm._v(" "),
+    _c("div", { staticClass: "question-title form-group" }, [
+      _c("label", { attrs: { for: "" } }, [_vm._v("Текст вопроса")]),
       _vm._v(" "),
-      _c("div", { staticClass: "form-check" }, [
-        _c("input", {
-          directives: [
-            {
-              name: "model",
-              rawName: "v-model",
-              value: _vm.privateCheck,
-              expression: "privateCheck",
-            },
-          ],
-          staticClass: "form-check-input",
-          attrs: { type: "checkbox", id: "questiprivate" },
-          domProps: {
-            checked: Array.isArray(_vm.privateCheck)
-              ? _vm._i(_vm.privateCheck, null) > -1
-              : _vm.privateCheck,
-          },
-          on: {
-            change: function ($event) {
-              var $$a = _vm.privateCheck,
-                $$el = $event.target,
-                $$c = $$el.checked ? true : false
-              if (Array.isArray($$a)) {
-                var $$v = null,
-                  $$i = _vm._i($$a, $$v)
-                if ($$el.checked) {
-                  $$i < 0 && (_vm.privateCheck = $$a.concat([$$v]))
-                } else {
-                  $$i > -1 &&
-                    (_vm.privateCheck = $$a
-                      .slice(0, $$i)
-                      .concat($$a.slice($$i + 1)))
-                }
-              } else {
-                _vm.privateCheck = $$c
-              }
-            },
-          },
-        }),
-        _vm._v(" "),
-        _c(
-          "label",
+      _c("input", {
+        directives: [
           {
-            staticClass: "form-check-label",
-            attrs: { for: "question_private" },
+            name: "model",
+            rawName: "v-model",
+            value: _vm.name,
+            expression: "name",
           },
-          [_vm._v("Приватный вопрос")]
-        ),
-      ]),
-      _vm._v(" "),
-      _c("div", { staticClass: "question-title form-group" }, [
-        _c("label", { attrs: { for: "" } }, [_vm._v("Тип вопроса")]),
-        _vm._v(" "),
-        _c(
-          "select",
-          {
-            directives: [
-              {
-                name: "model",
-                rawName: "v-model",
-                value: _vm.type,
-                expression: "type",
-              },
-            ],
-            attrs: { name: "type", id: "question_type" },
-            on: {
-              change: function ($event) {
-                var $$selectedVal = Array.prototype.filter
-                  .call($event.target.options, function (o) {
-                    return o.selected
-                  })
-                  .map(function (o) {
-                    var val = "_value" in o ? o._value : o.value
-                    return val
-                  })
-                _vm.type = $event.target.multiple
-                  ? $$selectedVal
-                  : $$selectedVal[0]
-              },
-            },
+        ],
+        staticClass: "form-control",
+        attrs: {
+          type: "text",
+          id: "question_text",
+          "aria-describedby": "question_text_help",
+          placeholder: "Новый вопрос",
+        },
+        domProps: { value: _vm.name },
+        on: {
+          input: function ($event) {
+            if ($event.target.composing) {
+              return
+            }
+            _vm.name = $event.target.value
           },
-          _vm._l(_vm.types, function (type, index) {
-            return _c(
-              "option",
-              { key: index, domProps: { value: type.code } },
-              [
-                _vm._v(
-                  "\n                " + _vm._s(type.name) + "\n            "
-                ),
-              ]
-            )
-          }),
-          0
-        ),
-      ]),
-      _vm._v(" "),
-      _c("div", { staticClass: "question-title form-group" }, [
-        _c("label", { attrs: { for: "" } }, [_vm._v("Дисциплины вопроса")]),
-        _vm._v(" "),
-        _c(
-          "select",
-          {
-            directives: [
-              {
-                name: "model",
-                rawName: "v-model",
-                value: _vm.disciplines,
-                expression: "disciplines",
-              },
-            ],
-            attrs: { name: "disciplines", id: "question_disciplines" },
-            on: {
-              change: function ($event) {
-                var $$selectedVal = Array.prototype.filter
-                  .call($event.target.options, function (o) {
-                    return o.selected
-                  })
-                  .map(function (o) {
-                    var val = "_value" in o ? o._value : o.value
-                    return val
-                  })
-                _vm.disciplines = $event.target.multiple
-                  ? $$selectedVal
-                  : $$selectedVal[0]
-              },
-            },
-          },
-          _vm._l(_vm.types, function (type, index) {
-            return _c(
-              "option",
-              { key: index, domProps: { value: type.code } },
-              [
-                _vm._v(
-                  "\n                " + _vm._s(type.name) + "\n            "
-                ),
-              ]
-            )
-          }),
-          0
-        ),
-      ]),
-      _vm._v(" "),
-      _c("h5", [_vm._v("Ответы")]),
-      _vm._v(" "),
-      _vm._l(_vm.answers, function (answer, index) {
-        return _c("div", { key: index, staticClass: "answer-item" }, [
-          _c("div", { staticClass: "form-group" }, [
-            _c("label", [_vm._v("Текст ответа")]),
-            _vm._v(" "),
-            _c("input", {
-              directives: [
-                {
-                  name: "model",
-                  rawName: "v-model",
-                  value: answer.text,
-                  expression: "answer.text",
-                },
-              ],
-              staticClass: "form-control",
-              attrs: {
-                type: "text",
-                "aria-describedby": "answer_text_" + index,
-                placeholder: "Вариант ответа",
-              },
-              domProps: { value: answer.text },
-              on: {
-                input: function ($event) {
-                  if ($event.target.composing) {
-                    return
-                  }
-                  _vm.$set(answer, "text", $event.target.value)
-                },
-              },
-            }),
-            _vm._v(" "),
-            _c(
-              "small",
-              {
-                staticClass: "form-text text-muted",
-                attrs: { id: "answer_text_" + index },
-              },
-              [_vm._v("Не более 255 символов")]
-            ),
-          ]),
-          _vm._v(" "),
-          _c("div", { staticClass: "form-check" }, [
-            _c("input", {
-              directives: [
-                {
-                  name: "model",
-                  rawName: "v-model",
-                  value: answer.isCorrect,
-                  expression: "answer.isCorrect",
-                },
-              ],
-              staticClass: "form-check-input",
-              attrs: { type: "checkbox" },
-              domProps: {
-                checked: Array.isArray(answer.isCorrect)
-                  ? _vm._i(answer.isCorrect, null) > -1
-                  : answer.isCorrect,
-              },
-              on: {
-                change: function ($event) {
-                  var $$a = answer.isCorrect,
-                    $$el = $event.target,
-                    $$c = $$el.checked ? true : false
-                  if (Array.isArray($$a)) {
-                    var $$v = null,
-                      $$i = _vm._i($$a, $$v)
-                    if ($$el.checked) {
-                      $$i < 0 &&
-                        _vm.$set(answer, "isCorrect", $$a.concat([$$v]))
-                    } else {
-                      $$i > -1 &&
-                        _vm.$set(
-                          answer,
-                          "isCorrect",
-                          $$a.slice(0, $$i).concat($$a.slice($$i + 1))
-                        )
-                    }
-                  } else {
-                    _vm.$set(answer, "isCorrect", $$c)
-                  }
-                },
-              },
-            }),
-            _vm._v(" "),
-            _c("label", { staticClass: "form-check-label" }, [
-              _vm._v("Правильный"),
-            ]),
-          ]),
-        ])
+        },
       }),
       _vm._v(" "),
       _c(
-        "button",
+        "small",
         {
-          staticClass: "btn btn-outline-secondary",
+          staticClass: "form-text text-muted",
+          attrs: { id: "question_text_help" },
+        },
+        [_vm._v("Не более 510 символов")]
+      ),
+    ]),
+    _vm._v(" "),
+    _c("div", { staticClass: "form-check" }, [
+      _c("input", {
+        directives: [
+          {
+            name: "model",
+            rawName: "v-model",
+            value: _vm.privateCheck,
+            expression: "privateCheck",
+          },
+        ],
+        staticClass: "form-check-input",
+        attrs: { type: "checkbox", id: "questiprivate" },
+        domProps: {
+          checked: Array.isArray(_vm.privateCheck)
+            ? _vm._i(_vm.privateCheck, null) > -1
+            : _vm.privateCheck,
+        },
+        on: {
+          change: function ($event) {
+            var $$a = _vm.privateCheck,
+              $$el = $event.target,
+              $$c = $$el.checked ? true : false
+            if (Array.isArray($$a)) {
+              var $$v = null,
+                $$i = _vm._i($$a, $$v)
+              if ($$el.checked) {
+                $$i < 0 && (_vm.privateCheck = $$a.concat([$$v]))
+              } else {
+                $$i > -1 &&
+                  (_vm.privateCheck = $$a
+                    .slice(0, $$i)
+                    .concat($$a.slice($$i + 1)))
+              }
+            } else {
+              _vm.privateCheck = $$c
+            }
+          },
+        },
+      }),
+      _vm._v(" "),
+      _c(
+        "label",
+        { staticClass: "form-check-label", attrs: { for: "question_private" } },
+        [_vm._v("Приватный вопрос")]
+      ),
+    ]),
+    _vm._v(" "),
+    _c("div", { staticClass: "form-group" }, [
+      _c("label", { attrs: { for: "" } }, [_vm._v("Тип вопроса")]),
+      _vm._v(" "),
+      _c(
+        "select",
+        {
+          directives: [
+            {
+              name: "model",
+              rawName: "v-model",
+              value: _vm.type,
+              expression: "type",
+            },
+          ],
+          attrs: { name: "type", id: "question_type" },
           on: {
-            click: function ($event) {
-              return _vm.addAnswer()
+            change: function ($event) {
+              var $$selectedVal = Array.prototype.filter
+                .call($event.target.options, function (o) {
+                  return o.selected
+                })
+                .map(function (o) {
+                  var val = "_value" in o ? o._value : o.value
+                  return val
+                })
+              _vm.type = $event.target.multiple
+                ? $$selectedVal
+                : $$selectedVal[0]
             },
           },
         },
-        [_vm._v("Добавить вариант ответа")]
+        _vm._l(_vm.types, function (type, index) {
+          return _c("option", { key: index, domProps: { value: type.code } }, [
+            _vm._v("\n                " + _vm._s(type.name) + "\n            "),
+          ])
+        }),
+        0
       ),
-    ],
-    2
-  )
+    ]),
+    _vm._v(" "),
+    _c(
+      "div",
+      { staticClass: "form-group" },
+      [
+        _c("label", { attrs: { for: "question_disciplines" } }, [
+          _vm._v("Дисциплины вопроса"),
+        ]),
+        _vm._v(" "),
+        _c("multiselect", {
+          attrs: {
+            options: _vm.disciplines,
+            multiple: true,
+            taggable: true,
+            label: "discipline_name",
+            "track-by": "id",
+            placeholder: "Дисциплины",
+            name: "disciplines",
+            searchable: true,
+          },
+          model: {
+            value: _vm.disciplinesAdd,
+            callback: function ($$v) {
+              _vm.disciplinesAdd = $$v
+            },
+            expression: "disciplinesAdd",
+          },
+        }),
+      ],
+      1
+    ),
+    _vm._v(" "),
+    _c("h5", { staticClass: "h4" }, [_vm._v("Ответы")]),
+    _vm._v(" "),
+    _vm.type == "text"
+      ? _c(
+          "div",
+          {
+            staticClass: "alert alert-warning mt-3 mb-3",
+            attrs: { role: "alert" },
+          },
+          [_vm._v("\n        Введите все ПРАВИЛЬНЫЕ текстовые ответы\n    ")]
+        )
+      : _vm._e(),
+    _vm._v(" "),
+    _c(
+      "div",
+      { staticClass: "answer-body" },
+      [
+        _vm._l(_vm.answers, function (answer, index) {
+          return _c(
+            "div",
+            {
+              key: index,
+              staticClass: "answer-item",
+              class: _vm.getDeleteClass(index),
+            },
+            [
+              _c("div", { staticClass: "form-group" }, [
+                _c("label", [_vm._v("Текст ответа")]),
+                _vm._v(" "),
+                _c("input", {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: answer.text,
+                      expression: "answer.text",
+                    },
+                  ],
+                  staticClass: "form-control",
+                  attrs: {
+                    type: "text",
+                    "aria-describedby": "answer_text_" + index,
+                    placeholder: "Вариант ответа",
+                  },
+                  domProps: { value: answer.text },
+                  on: {
+                    input: function ($event) {
+                      if ($event.target.composing) {
+                        return
+                      }
+                      _vm.$set(answer, "text", $event.target.value)
+                    },
+                  },
+                }),
+                _vm._v(" "),
+                _c(
+                  "small",
+                  {
+                    staticClass: "form-text text-muted",
+                    attrs: { id: "answer_text_" + index },
+                  },
+                  [_vm._v("Не более 255 символов")]
+                ),
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "form-check" }, [
+                _c("input", {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: answer.isCorrect,
+                      expression: "answer.isCorrect",
+                    },
+                  ],
+                  staticClass: "form-check-input",
+                  attrs: { type: "checkbox" },
+                  domProps: {
+                    checked: Array.isArray(answer.isCorrect)
+                      ? _vm._i(answer.isCorrect, null) > -1
+                      : answer.isCorrect,
+                  },
+                  on: {
+                    change: function ($event) {
+                      var $$a = answer.isCorrect,
+                        $$el = $event.target,
+                        $$c = $$el.checked ? true : false
+                      if (Array.isArray($$a)) {
+                        var $$v = null,
+                          $$i = _vm._i($$a, $$v)
+                        if ($$el.checked) {
+                          $$i < 0 &&
+                            _vm.$set(answer, "isCorrect", $$a.concat([$$v]))
+                        } else {
+                          $$i > -1 &&
+                            _vm.$set(
+                              answer,
+                              "isCorrect",
+                              $$a.slice(0, $$i).concat($$a.slice($$i + 1))
+                            )
+                        }
+                      } else {
+                        _vm.$set(answer, "isCorrect", $$c)
+                      }
+                    },
+                  },
+                }),
+                _vm._v(" "),
+                _c("label", { staticClass: "form-check-label" }, [
+                  _vm._v("Правильный"),
+                ]),
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "form-check" }, [
+                _c("input", {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: answer.isDelete,
+                      expression: "answer.isDelete",
+                    },
+                  ],
+                  staticClass: "form-check-input",
+                  attrs: { type: "checkbox" },
+                  domProps: {
+                    checked: Array.isArray(answer.isDelete)
+                      ? _vm._i(answer.isDelete, null) > -1
+                      : answer.isDelete,
+                  },
+                  on: {
+                    change: function ($event) {
+                      var $$a = answer.isDelete,
+                        $$el = $event.target,
+                        $$c = $$el.checked ? true : false
+                      if (Array.isArray($$a)) {
+                        var $$v = null,
+                          $$i = _vm._i($$a, $$v)
+                        if ($$el.checked) {
+                          $$i < 0 &&
+                            _vm.$set(answer, "isDelete", $$a.concat([$$v]))
+                        } else {
+                          $$i > -1 &&
+                            _vm.$set(
+                              answer,
+                              "isDelete",
+                              $$a.slice(0, $$i).concat($$a.slice($$i + 1))
+                            )
+                        }
+                      } else {
+                        _vm.$set(answer, "isDelete", $$c)
+                      }
+                    },
+                  },
+                }),
+                _vm._v(" "),
+                _c("label", { staticClass: "form-check-label text-danger" }, [
+                  _vm._v("Удалить"),
+                ]),
+              ]),
+            ]
+          )
+        }),
+        _vm._v(" "),
+        _c(
+          "button",
+          {
+            staticClass: "btn btn-outline-secondary mt-3 mb-3",
+            on: {
+              click: function ($event) {
+                return _vm.addAnswer()
+              },
+            },
+          },
+          [_vm._v("\n            Добавить вариант ответа\n        ")]
+        ),
+      ],
+      2
+    ),
+    _vm._v(" "),
+    _c(
+      "button",
+      {
+        staticClass: "btn btn-success",
+        on: {
+          click: function ($event) {
+            return _vm.send()
+          },
+        },
+      },
+      [_vm._v("Сохранить")]
+    ),
+  ])
 }
 var staticRenderFns = []
 render._withStripped = true
