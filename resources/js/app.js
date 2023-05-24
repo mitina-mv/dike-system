@@ -10,6 +10,10 @@ window.Vue = require('vue').default;
 import Notifications from 'vue-notification'
 Vue.use(Notifications)
 
+import VueTabulator from 'vue-tabulator';
+// Vue.component('VueTabulator', VueTabulator);
+
+Vue.use(VueTabulator);
 /**
  * The following block of code may be used to automatically register your
  * Vue components. It will recursively scan this directory for the Vue
@@ -44,10 +48,12 @@ Vue.component('multiselect', Multiselect)
 import StudentList from './components/StudentList.vue'
 Vue.component('student-list', StudentList)
 
-// Vue.component(
-//     'student-form', 
-//     require('./components/StudentForm.vue')
-// );
+import QuestionList from './components/questions/QuestionList.vue'
+Vue.component('question-list', QuestionList)
+
+import QuestionForm from './components/questions/QuestionForm.vue'
+Vue.component('question-form', QuestionForm)
+
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to

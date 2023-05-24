@@ -1,5 +1,6 @@
 @php
-    use Illuminate\Support\Facades\Auth;    
+    use Illuminate\Support\Facades\Auth;
+    use App\Models\Role;  
 @endphp
 
 <nav x-data="{ open: false }" class="bg-white border-b border-gray-100">
@@ -23,6 +24,12 @@
                     <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.index')">
                         {{ __('Пользователи') }}
                     </x-nav-link>
+
+                    @if (Auth::user()->role_id != Role::ROLE_STUDENT)                        
+                        <x-nav-link :href="route('question.index')" :active="request()->routeIs('question.index')">
+                            {{ __('Банк заданий') }}
+                        </x-nav-link>
+                    @endif
                 </div>
             </div>
 

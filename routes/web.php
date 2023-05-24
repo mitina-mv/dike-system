@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\OrgController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\QuestionController;
+use App\Http\Controllers\DisciplineController;
 
 /*
 |--------------------------------------------------------------------------
@@ -52,12 +54,28 @@ Route::group(['middleware' => ['auth']], function() {
 
         Route::get('teacher', [UsersController::class, 'createTeacher'])->name('users.createTeacher');
         Route::get('student', [UsersController::class, 'createStudent'])->name('users.createStudent');
-        // Route::post('store', [UsersController::class, 'sss'])->name('users.sss');
+        
         Route::post('student', [UsersController::class, 'storeStudent'])->name('users.store_student');
         Route::post('teacher', [UsersController::class, 'storeTeacher'])->name('users.store_teacher');
 
         Route::delete('/{id}', [UsersController::class, 'destroy'])->name('users.delete');
 
+    });
+
+    // question CRUD
+    Route::group(['prefix' => 'question'], function() {
+        Route::get('/', [QuestionController::class, 'index'])->name('question.index');
+        Route::get('/create', [QuestionController::class, 'formCreate'])->name('question.formCreate');
+        Route::post('/create', [QuestionController::class, 'create'])->name('question.create');
+        Route::get('/{id}', [QuestionController::class, 'read'])->name('question.read');
+        Route::post('/{id}', [QuestionController::class, 'update'])->name('question.update');
+        Route::delete('/{id}', [QuestionController::class, 'destroy'])->name('question.delete');
+    });
+
+    // question CRUD
+    Route::group(['prefix' => 'discipline'], function() {
+        Route::get('/', [DisciplineController::class, 'index'])->name('discipline.index');
+        Route::post('/', [DisciplineController::class, 'create'])->name('discipline.create');
     });
 });
 // 
