@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\QuestionCreateRequest;
+use App\Models\Answer;
 use App\Models\Discipline;
 use App\Models\Question;
 use App\Models\Role;
@@ -96,10 +98,17 @@ class QuestionController extends Controller
                 'id' => $id,
                 'org_id' => $user->org_id,
                 // 'user_id' => $user->id
-            ])->first();
+            ])->select([
+                'question_private', 
+                'question_text', 
+                'question_settings', 
+                'mark', 
+                'discipline_id',
+                'id'
+            ])->with('answers')->first();
 
             if(!empty($question))
-                return view('question.form', compact('title', 'discipline'));
+                return view('question.form', compact('title', 'discipline', 'question'));
             else {
                 $error = 'Вы не имеете достаточных прав на это действие';
                 return view('question.index', compact('error')); 
@@ -110,9 +119,81 @@ class QuestionController extends Controller
         }
     }
 
-    public function create()
+    public function create(QuestionCreateRequest $request)
     {
-        # code...
+        if($this->checkRules())
+        {
+            $user = Auth::user();
+
+            // добавление вопроса
+            $question = Question::create([
+                "question_text" => $request->name,
+                "question_private" => $request->private,
+                "discipline_id" => $request->discipline,
+                "mark" => $request->mark,
+                "question_settings" => json_encode([ // TODO расширить (?)
+                    'type' => $request->type,
+                ]),
+                'org_id' => $user->org_id,
+                'user_id' => $user->id 
+            ]);
+
+            // добавление ответов
+            foreach($request->answers as $reqAns)
+            {
+                // если новый и сразу удалили 
+                if($reqAns['id'] == "__new" && $reqAns['isDelete'] == true)
+                    continue;
+
+                // если не новый и удалили
+                if(is_numeric($reqAns['id']) && $reqAns['isDelete'] == true)
+                {
+                    try {
+                        $answer = Answer::find($reqAns['id']);
+                        if(isset($answer))
+                            $answer->delete();
+                    } catch(Exception $e) {
+                        // return response()->json([
+                        //     'status' => 'error',
+                        //     'message' => "Ошибка при удалении"
+                        // ], Response::HTTP_BAD_REQUEST);
+                    }
+
+                    continue;
+                }
+
+                if(is_numeric($reqAns['id']))
+                {
+                    $answer = Answer::find($reqAns['id']);
+                    $answer->update([
+                        'answer_name' => $reqAns['text'],
+                        'answer_status' => $reqAns['isCorrect'],
+                        'question_id' => $question->id,
+                    ]);
+
+                    continue;
+                }
+
+                if($reqAns['id'] == '__new')
+                {
+                    $answer = Answer::create([
+                        'answer_name' => $reqAns['text'],
+                        'answer_status' => $reqAns['isCorrect'],
+                        'question_id' => $question->id,
+                    ]);
+                    continue;
+                }
+            }
+
+            return response()->json([
+                'message' => "Сохранено"
+            ], Response::HTTP_OK);
+        } else {
+            return response()->json([
+                'status' => 'error',
+                'message' => "Вы не имеете право добавления вопросов"
+            ], Response::HTTP_BAD_REQUEST);
+        }
     }
 
     public function update()

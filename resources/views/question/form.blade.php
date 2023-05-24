@@ -16,6 +16,9 @@
                 <div id="app"> 
                     <question-form
                         :disciplines='@json($discipline)'
+                        @if (isset($question))
+                            :question='@json($question)'
+                        @endif
                     />
                     <notifications/>
                 </div>

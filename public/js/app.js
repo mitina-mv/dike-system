@@ -8890,8 +8890,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vue_multiselect__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue-multiselect */ "./node_modules/vue-multiselect/dist/vue-multiselect.min.js");
-/* harmony import */ var vue_multiselect__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vue_multiselect__WEBPACK_IMPORTED_MODULE_0__);
 //
 //
 //
@@ -9012,7 +9010,16 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   props: {
@@ -9021,7 +9028,7 @@ __webpack_require__.r(__webpack_exports__);
       required: true
     },
     question: {
-      type: Array,
+      type: Object,
       required: false
     }
   },
@@ -9030,8 +9037,9 @@ __webpack_require__.r(__webpack_exports__);
       name: "",
       privateCheck: false,
       type: "single",
-      disciplinesAdd: [],
+      discipline: null,
       errorText: null,
+      mark: 1,
       types: [{
         name: "Одиночный выбор",
         code: "single"
@@ -9050,12 +9058,9 @@ __webpack_require__.r(__webpack_exports__);
       }]
     };
   },
-  components: {
-    Multiselect: (vue_multiselect__WEBPACK_IMPORTED_MODULE_0___default())
-  },
-  computed: {},
   methods: {
     addAnswer: function addAnswer() {
+      console.log(this.question);
       if (this.type == 'text') {
         this.answers.push({
           text: "",
@@ -9077,8 +9082,9 @@ __webpack_require__.r(__webpack_exports__);
       this.name = this.name.replace(/\s+/g, " ");
 
       // проверка наличия данных
-      if (!this.name || !this.disciplinesAdd || !this.type || !this.answers) {
+      if (!this.name || !this.discipline || !this.type || !this.answers) {
         this.errorText = 'Введите все обязательные поля: текст вопроса, тип, дисциплины. Проверьте ввод ответов.';
+        return;
       }
 
       // проверка наличия правильного ответа
@@ -9087,21 +9093,50 @@ __webpack_require__.r(__webpack_exports__);
       this.answers.forEach(function (item) {
         if (item.isCorrect == true && item.isDelete !== true) {
           flagCorrectAnswer = true;
-          if (_this.type == 'simple') {
+          if (_this.type == 'single') {
             ++countSimpleCorrectAnswer;
           }
         }
       });
       if (!flagCorrectAnswer) {
         this.errorText = 'Выберите хотя бы один правильный ответ среди тех, которые не удаляются';
+        return;
       }
-      if (countSimpleCorrectAnswer != 1) {
+      if (countSimpleCorrectAnswer != 1 && this.type == 'single') {
         this.errorText = 'Для одиночного выбора нужно ввести только один правильный ответ';
+        return;
       }
+      var url = '';
+      if (this.question) {
+        url = "/question/".concat(this.question.id);
+      } else {
+        url = "/question/create";
+      }
+      axios.post(url, {
+        name: this.name,
+        "private": this.privateCheck,
+        discipline: this.discipline,
+        type: this.type,
+        mark: this.mark,
+        answers: this.answers
+      }).then(function (response) {
+        this.errorText = null;
+        this.$notify({
+          title: 'Добавление / редактирование вопроса',
+          text: response.data.message,
+          type: 'success'
+        });
+      })["catch"](function (error) {
+        this.$notify({
+          title: 'Добавление / редактирование вопроса',
+          text: error.response.data.message ? error.response.data.message : "Не удалось обработать запрос",
+          type: 'error'
+        });
+        this.errorText = error.response.data.message ? error.response.data.message : "Не удалось обработать запрос";
+      });
     },
     getDeleteClass: function getDeleteClass(index) {
       return this.answers[index].isDelete ? "answer-item_delete" : "";
-      // return 'answer-item_delete' + index
     }
   }
 });
@@ -14673,7 +14708,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.answer-item[data-v-7ba1d977] {\r\n    padding: 1em;\n}\n.answer-item[data-v-7ba1d977]:nth-child(2n) {\r\n    background: #ebeefe;\n}\n.answer-item_delete[data-v-7ba1d977] {\r\n    background: #ffdbdb !important;\n}\n.answer-item_delete[data-v-7ba1d977]:before {\r\n    content: \"Будет удалено!\";\r\n    color: #fff;\r\n    font-weight: 800;\r\n    background: var(--bs-red);\r\n    padding: 4px 10px;\r\n    margin-bottom: 10px;\r\n    display: block;\n}\n.answer-body[data-v-7ba1d977] {\r\n    list-style-type: none;\r\n    counter-reset: css-counter 0;\n}\n.answer-body .answer-item[data-v-7ba1d977] {\r\n    counter-increment: css-counter 1;\r\n    position: relative;\n}\n.answer-body .answer-item[data-v-7ba1d977]:after {\r\n    content: counter(css-counter);\r\n    background: #fff;\r\n    color: var(--bs-indigo);\r\n    border: 2px solid var(--bs-indigo);\r\n    border-radius: 50%;\r\n    display: flex;\r\n    width: 30px;\r\n    height: 30px;\r\n    text-align: center;\r\n    font-weight: 700;\r\n    position: absolute;\r\n    align-items: center;\r\n    justify-content: center;\r\n    top: -5px;\r\n    right: -14px;\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.answer-item[data-v-7ba1d977] {\r\n    padding: 1em;\n}\n.answer-item[data-v-7ba1d977]:nth-child(2n) {\r\n    background: #ebeefe;\n}\n.answer-item_delete[data-v-7ba1d977] {\r\n    background: #ffdbdb !important;\n}\n.answer-item_delete[data-v-7ba1d977]:before {\r\n    content: \"Будет удалено!\";\r\n    color: #fff;\r\n    font-weight: 800;\r\n    background: var(--bs-red);\r\n    padding: 4px 10px;\r\n    margin-bottom: 10px;\r\n    display: block;\n}\n.answer-body[data-v-7ba1d977] {\r\n    list-style-type: none;\r\n    counter-reset: css-counter 0;\r\n    width: 100%;\n}\n.answer-body .answer-item[data-v-7ba1d977] {\r\n    counter-increment: css-counter 1;\r\n    position: relative;\n}\n.answer-body .answer-item[data-v-7ba1d977]:after {\r\n    content: counter(css-counter);\r\n    background: #fff;\r\n    color: var(--bs-indigo);\r\n    border: 2px solid var(--bs-indigo);\r\n    border-radius: 50%;\r\n    display: flex;\r\n    width: 30px;\r\n    height: 30px;\r\n    text-align: center;\r\n    font-weight: 700;\r\n    position: absolute;\r\n    align-items: center;\r\n    justify-content: center;\r\n    top: -5px;\r\n    right: -14px;\n}\n.d-grid[data-v-7ba1d977]{\r\n    gap: 8px;\n}\n.form-group[data-v-7ba1d977] {\r\n    display: grid;\r\n    width: 100%;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -57437,7 +57472,7 @@ var render = function () {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", [
+  return _c("div", { staticClass: "d-grid" }, [
     _c(
       "div",
       {
@@ -57493,6 +57528,34 @@ var render = function () {
         },
         [_vm._v("Не более 510 символов")]
       ),
+    ]),
+    _vm._v(" "),
+    _c("div", { staticClass: "form-group" }, [
+      _c("label", { attrs: { for: "" } }, [
+        _vm._v("Стоимость вопроса (по умолчанию 1)"),
+      ]),
+      _vm._v(" "),
+      _c("input", {
+        directives: [
+          {
+            name: "model",
+            rawName: "v-model",
+            value: _vm.mark,
+            expression: "mark",
+          },
+        ],
+        staticClass: "form-control",
+        attrs: { type: "number", id: "question_mark" },
+        domProps: { value: _vm.mark },
+        on: {
+          input: function ($event) {
+            if ($event.target.composing) {
+              return
+            }
+            _vm.mark = $event.target.value
+          },
+        },
+      }),
     ]),
     _vm._v(" "),
     _c("div", { staticClass: "form-check" }, [
@@ -57582,36 +57645,51 @@ var render = function () {
       ),
     ]),
     _vm._v(" "),
-    _c(
-      "div",
-      { staticClass: "form-group" },
-      [
-        _c("label", { attrs: { for: "question_disciplines" } }, [
-          _vm._v("Дисциплины вопроса"),
-        ]),
-        _vm._v(" "),
-        _c("multiselect", {
-          attrs: {
-            options: _vm.disciplines,
-            multiple: true,
-            taggable: true,
-            label: "discipline_name",
-            "track-by": "id",
-            placeholder: "Дисциплины",
-            name: "disciplines",
-            searchable: true,
-          },
-          model: {
-            value: _vm.disciplinesAdd,
-            callback: function ($$v) {
-              _vm.disciplinesAdd = $$v
+    _c("div", { staticClass: "form-group" }, [
+      _c("label", { attrs: { for: "question_disciplines" } }, [
+        _vm._v("Дисциплина вопроса"),
+      ]),
+      _vm._v(" "),
+      _c(
+        "select",
+        {
+          directives: [
+            {
+              name: "model",
+              rawName: "v-model",
+              value: _vm.discipline,
+              expression: "discipline",
             },
-            expression: "disciplinesAdd",
+          ],
+          attrs: { name: "type", id: "question_disciplines" },
+          on: {
+            change: function ($event) {
+              var $$selectedVal = Array.prototype.filter
+                .call($event.target.options, function (o) {
+                  return o.selected
+                })
+                .map(function (o) {
+                  var val = "_value" in o ? o._value : o.value
+                  return val
+                })
+              _vm.discipline = $event.target.multiple
+                ? $$selectedVal
+                : $$selectedVal[0]
+            },
           },
+        },
+        _vm._l(_vm.disciplines, function (dis, index) {
+          return _c("option", { key: index, domProps: { value: dis.id } }, [
+            _vm._v(
+              "\n                " +
+                _vm._s(dis.discipline_name) +
+                "\n            "
+            ),
+          ])
         }),
-      ],
-      1
-    ),
+        0
+      ),
+    ]),
     _vm._v(" "),
     _c("h5", { staticClass: "h4" }, [_vm._v("Ответы")]),
     _vm._v(" "),

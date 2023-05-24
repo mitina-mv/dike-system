@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="d-grid">
         <div class="alert alert-danger mt-3 mb-3" role="alert" v-show="errorText">
             {{ errorText }}
         </div>
@@ -17,6 +17,18 @@
             <small id="question_text_help" class="form-text text-muted"
                 >Не более 510 символов</small
             >
+        </div>
+
+        
+        
+        <div class="form-group">
+            <label for="">Стоимость вопроса (по умолчанию 1)</label>
+            <input
+                type="number"
+                class="form-control"
+                id="question_mark"
+                v-model="mark"
+            />
         </div>
 
         <div class="form-check">
@@ -45,18 +57,16 @@
         </div>
 
         <div class="form-group">
-            <label for="question_disciplines">Дисциплины вопроса</label>
-            <multiselect
-                v-model="disciplinesAdd"
-                :options="disciplines"
-                :multiple="true"
-                :taggable="true"
-                label="discipline_name"
-                track-by="id"
-                placeholder="Дисциплины"
-                name="disciplines"
-                :searchable="true"
-            ></multiselect>
+            <label for="question_disciplines">Дисциплина вопроса</label>
+            <select name="type" id="question_disciplines" v-model="discipline">
+                <option
+                    v-for="(dis, index) in disciplines"
+                    :key="index"
+                    :value="dis.id"
+                >
+                    {{ dis.discipline_name }}
+                </option>
+            </select>
         </div>
 
         <h5 class="h4">Ответы</h5>
@@ -119,8 +129,6 @@
 </template>
 
 <script>
-import Multiselect from "vue-multiselect";
-
 export default {
     props: {
         disciplines: {
@@ -128,7 +136,7 @@ export default {
             required: true,
         },
         question: {
-            type: Array,
+            type: Object,
             required: false,
         },
     },
@@ -137,8 +145,9 @@ export default {
             name: "",
             privateCheck: false,
             type: "single",
-            disciplinesAdd: [],
+            discipline: null,
             errorText: null,
+            mark: 1,
             types: [
                 {
                     name: "Одиночный выбор",
@@ -158,10 +167,9 @@ export default {
             ],
         };
     },
-    components: { Multiselect },
-    computed: {},
     methods: {
         addAnswer: function () {
+            console.log(this.question);
             if(this.type == 'text') {
                 this.answers.push({
                     text: "",
@@ -182,10 +190,11 @@ export default {
             this.name = this.name.replace(/\s+/g, " ");
 
             // проверка наличия данных
-            if(!this.name || !this.disciplinesAdd
+            if(!this.name || !this.discipline
                 || !this.type || !this.answers
             ) {
                 this.errorText = 'Введите все обязательные поля: текст вопроса, тип, дисциплины. Проверьте ввод ответов.'
+                return;
             }
 
             // проверка наличия правильного ответа
@@ -195,7 +204,7 @@ export default {
                 if(item.isCorrect == true && item.isDelete !== true)
                 {
                     flagCorrectAnswer = true;
-                    if(this.type == 'simple') {
+                    if(this.type == 'single') {
                        ++countSimpleCorrectAnswer; 
                     }
                 }
@@ -203,17 +212,49 @@ export default {
 
             if(!flagCorrectAnswer) {
                 this.errorText = 'Выберите хотя бы один правильный ответ среди тех, которые не удаляются'
+                return;
             }
             
-            if(countSimpleCorrectAnswer != 1) {
+            if(countSimpleCorrectAnswer != 1 && this.type == 'single') {
                 this.errorText = 'Для одиночного выбора нужно ввести только один правильный ответ'
+                return;
             }
 
+            let url = '';
+            if(this.question)
+            {
+                url = `/question/${this.question.id}`
+            } else {
+                url = `/question/create`
+            }
 
+            axios.post(url, {
+                name: this.name,
+                private: this.privateCheck,
+                discipline: this.discipline,
+                type: this.type,
+                mark: this.mark,
+                answers: this.answers
+            })
+                .then(function (response) {
+                    this.errorText = null
+                    this.$notify({
+                        title: 'Добавление / редактирование вопроса',
+                        text: response.data.message,
+                        type: 'success',
+                    });
+                })
+                .catch(function (error) {
+                    this.$notify({
+                        title: 'Добавление / редактирование вопроса',
+                        text: error.response.data.message ? error.response.data.message : "Не удалось обработать запрос",
+                        type: 'error',
+                    });
+                    this.errorText = error.response.data.message ? error.response.data.message : "Не удалось обработать запрос"
+                });
         },
         getDeleteClass(index) {
             return this.answers[index].isDelete ? "answer-item_delete" : "";
-            // return 'answer-item_delete' + index
         },
     },
 };
@@ -242,6 +283,7 @@ export default {
 .answer-body {
     list-style-type: none;
     counter-reset: css-counter 0;
+    width: 100%;
 }
 
 .answer-body .answer-item {
@@ -265,5 +307,12 @@ export default {
     justify-content: center;
     top: -5px;
     right: -14px;
+}
+.d-grid{
+    gap: 8px;
+}
+.form-group {
+    display: grid;
+    width: 100%;
 }
 </style>
