@@ -7,13 +7,16 @@
 require('./bootstrap');
 
 window.Vue = require('vue').default;
+
 import Notifications from 'vue-notification'
 Vue.use(Notifications)
 
 import VueTabulator from 'vue-tabulator';
-// Vue.component('VueTabulator', VueTabulator);
-
 Vue.use(VueTabulator);
+
+import VueFormulate from '@braid/vue-formulate'
+Vue.use(VueFormulate)
+
 /**
  * The following block of code may be used to automatically register your
  * Vue components. It will recursively scan this directory for the Vue
@@ -53,6 +56,12 @@ Vue.component('question-list', QuestionList)
 
 import QuestionForm from './components/questions/QuestionForm.vue'
 Vue.component('question-form', QuestionForm)
+
+import TableFilterDiscipline from './components/TableFilterDisciplines.vue'
+Vue.component('table-filter-discipline', TableFilterDiscipline)
+
+import TestForm from './components/tests/TestForm.vue'
+Vue.component('test-form', TestForm)
 
 
 /**

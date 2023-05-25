@@ -17,10 +17,6 @@
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
-                    </x-nav-link>
-
                     <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.index')">
                         {{ __('Пользователи') }}
                     </x-nav-link>
@@ -28,6 +24,18 @@
                     @if (Auth::user()->role_id != Role::ROLE_STUDENT)                        
                         <x-nav-link :href="route('question.index')" :active="request()->routeIs('question.index')">
                             {{ __('Банк заданий') }}
+                        </x-nav-link>
+                    @endif
+
+                    @if (Auth::user()->role_id == Role::ROLE_TEACHER)                        
+                        <x-nav-link :href="route('tests.index')" :active="request()->routeIs('tests.index')">
+                            {{ __('Тесты') }}
+                        </x-nav-link>
+                    @endif
+
+                    @if (Auth::user()->role_id == Role::ROLE_TEACHER)                        
+                        <x-nav-link :href="route('tests.index')" :active="request()->routeIs('tests.index')">
+                            {{ __('Назначение тестирования') }}
                         </x-nav-link>
                     @endif
                 </div>

@@ -31,7 +31,8 @@ class QuestionController extends Controller
         {
             $user = Auth::user();
             $discipline = Discipline::orderBy('discipline_name', 'asc')->get()->all();
-
+            
+            $tmpQuestions = [];
             switch($user->role_id)
             {
                 case Role::ROLE_TEACHER:
@@ -49,7 +50,7 @@ class QuestionController extends Controller
                     ])->get()->all();
             }
 
-
+            $questions = [];
             foreach($tmpQuestions as $question)
             {
                 $questions[$question->discipline_id][] = $question;
