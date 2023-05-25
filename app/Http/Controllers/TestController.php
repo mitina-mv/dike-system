@@ -195,6 +195,37 @@ class TestController extends Controller
 
     public function destroy($id)
     {
-        
+        if(!$this->checkRules()){
+            return response()->json([
+                'status' => 'error',
+                'message' => "Вы не имеете право добавления тестов. Не знаем, как вы попали сюда, но очень негодуем."
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        $user = Auth::user();
+        $test = Test::where([
+            'user_id' => $user->id,
+            'id' => $id
+        ])->first();
+
+        if(empty($test))
+        {
+            return response()->json([
+                'status' => 'error',
+                'message' => "Вероятно, вы запрашиваете тест, который вам не принадлежит. Не надо так, мы все видим."
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        // попытка полностью удалить вопрос
+        try {
+            $test->forceDelete();
+        } catch(Exception $e) {
+            // если не получается, то ставим флаг удаления
+            $test->delete();
+        }
+
+        return response()->json([
+            'message' => "Удаление свершилось!"
+        ], Response::HTTP_OK);
     }
 }
