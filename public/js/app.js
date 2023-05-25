@@ -9581,6 +9581,15 @@ __webpack_require__.r(__webpack_exports__);
       id: null
     };
   },
+  mounted: function mounted() {
+    if (this.test) {
+      this.formValues.name = this.test.test_name;
+      this.formValues.desc = this.test.test_description;
+      this.formValues.countQuestion = JSON.parse(this.test.test_settings).question_count;
+      this.formValues.discipline = this.test.discipline_id;
+      this.id = this.test.id;
+    }
+  },
   methods: {
     send: function send(data) {
       var _this = this;
@@ -9591,9 +9600,8 @@ __webpack_require__.r(__webpack_exports__);
         url = "/test/create";
       }
       axios.post(url, data).then(function (response) {
-        console.log(response);
-        if (!_this.id && response.data.test) {
-          _this.id = response.data.test.id;
+        if (!_this.id && response.data.id) {
+          _this.id = response.data.id;
         }
         _this.$notify({
           title: "Добавление / редактирование теста",

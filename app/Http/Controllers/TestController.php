@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Role;
 use App\Models\Discipline;
 use App\Models\Test;
-
+use Exception;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -57,8 +57,7 @@ class TestController extends Controller
             'user_id' => Auth::user()->id
         ])->get();
 
-        $discipline = Discipline::orderBy('discipline_name', 'asc')
-                        ->pluck('discipline_name', 'id');;
+        $discipline = Discipline::orderBy('discipline_name', 'asc')->get()->all();
         
         $tests = [];
         foreach($tmptests as $test)
@@ -96,7 +95,30 @@ class TestController extends Controller
 
     public function read($id)
     {
-        
+        if(!$this->checkRules())
+        {
+            $error = 'Вы не имеете достаточных прав на это действие';
+            return view('tests.index', compact('error'));
+        }
+
+        $discipline = Discipline::orderBy('discipline_name', 'asc')
+                        ->pluck('discipline_name', 'id');
+        $user = Auth::user();
+        $test = Test::where([
+            'user_id' => $user->id,
+            'id' => $id
+        ])->first();
+
+        if(empty($test))
+        {
+            return response()->json([
+                'status' => 'error',
+                'message' => "Вероятно, вы запрашиваете тест, который вам не принадлежит. Не надо так, мы все видим."
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+
+        return view('tests.form', compact('discipline', 'test'));
     }
 
     public function create(Request $request)
@@ -122,14 +144,53 @@ class TestController extends Controller
         ]);
         
         return response()->json([
-            'message' => "Сохранено",
-            'test' => $test
+            'message' => "Запись успешно создана!",
+            'id' => $test->id
         ], Response::HTTP_OK);
     }
 
-    public function update($id)
+    public function update(Request $request, $id)
     {
-        
+        if(!$this->checkRules()){
+            return response()->json([
+                'status' => 'error',
+                'message' => "Вы не имеете право добавления тестов. Не знаем, как вы попали сюда, но очень негодуем."
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        $user = Auth::user();
+        $test = Test::where([
+            'user_id' => $user->id,
+            'id' => $id
+        ])->first();
+
+        if(empty($test))
+        {
+            return response()->json([
+                'status' => 'error',
+                'message' => "Вероятно, вы запрашиваете тест, который вам не принадлежит. Не надо так, мы все видим."
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        try {
+            $test->update([
+                'test_description' => isset($request->desc) ? $request->desc : null,
+                'test_settings' => json_encode([
+                    'question_count' => $request->countQuestion
+                ]),
+                'test_name' => $request->name,
+                'discipline_id' => $request->discipline
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => "При обновлении что-то пошло не так ("
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        return response()->json([
+            'message' => "Все изменения сохранены!"
+        ], Response::HTTP_OK);
     }
 
     public function destroy($id)

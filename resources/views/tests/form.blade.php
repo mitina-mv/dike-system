@@ -15,6 +15,10 @@
                     <div id="app">
                         <test-form
                             :disciplines='@json($discipline)'
+                            @if (isset($test))
+                                :test='@json($test)'
+                            @endif
+
                         ></test-form>
                         
                         <notifications/>

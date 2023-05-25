@@ -50,6 +50,16 @@ export default {
             id: null,
         };
     },
+    mounted() {
+        if(this.test)
+        {
+            this.formValues.name = this.test.test_name
+            this.formValues.desc = this.test.test_description
+            this.formValues.countQuestion = JSON.parse(this.test.test_settings).question_count
+            this.formValues.discipline = this.test.discipline_id
+            this.id = this.test.id
+        }
+    },
     methods: {
         send(data) {
             let url = "";
@@ -62,9 +72,8 @@ export default {
             axios
                 .post(url, data)
                 .then((response) => {
-                    console.log(response);
-                    if (!this.id && response.data.test) {
-                        this.id = response.data.test.id;
+                    if (!this.id && response.data.id) {
+                        this.id = response.data.id;
                     }
 
                     this.$notify({
