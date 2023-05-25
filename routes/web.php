@@ -7,6 +7,7 @@ use App\Http\Controllers\UsersController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\DisciplineController;
+use App\Http\Controllers\TestController;
 
 /*
 |--------------------------------------------------------------------------
@@ -72,10 +73,22 @@ Route::group(['middleware' => ['auth']], function() {
         Route::delete('/{id}', [QuestionController::class, 'destroy'])->name('question.delete');
     });
 
-    // question CRUD
+    // discipline CRUD
     Route::group(['prefix' => 'discipline'], function() {
         Route::get('/', [DisciplineController::class, 'index'])->name('discipline.index');
         Route::post('/', [DisciplineController::class, 'create'])->name('discipline.create');
+    });
+
+    // test CRUD
+    Route::group(['prefix' => 'test'], function() {
+        Route::get('/', [TestController::class, 'index'])->name('tests.index');
+
+        Route::get('/create', [TestController::class, 'formCreate'])->name('tests.formCreate');
+        Route::post('/create', [TestController::class, 'create'])->name('tests.create');
+        
+        Route::get('/{id}', [TestController::class, 'read'])->name('tests.read');
+        Route::post('/{id}', [TestController::class, 'update'])->name('tests.update');
+        Route::delete('/{id}', [TestController::class, 'destroy'])->name('tests.delete');
     });
 });
 // 

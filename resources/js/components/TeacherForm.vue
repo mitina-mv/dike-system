@@ -1,26 +1,49 @@
 <template>
     <div>
         <div v-for="(field, index) in fields" :key="index">
-            <input
-                v-model="field.lastname"
-                placeholder="Фамилия"
-                :name="'items[' + index + '][lastname]'"
-            />
-            <input
-                v-model="field.firstname"
-                placeholder="Имя"
-                :name="'items[' + index + '][firstname]'"
-            />
-            <input
-                v-model="field.patronymic"
-                placeholder="Отчество"
-                :name="'items[' + index + '][patronymic]'"
-            />
-            <input
-                v-model="field.user_email"
-                placeholder="Email"
-                :name="'items[' + index + '][user_email]'"
-            />
+            <div class="form-group">
+                <label for="">Фамилия</label>
+                <input
+                    type="text"
+                    class="form-control"
+                    placeholder="Фамилия"
+                    :name="'items[' + index + '][lastname]'"
+                    v-model="field.lastname"
+                />
+            </div>
+            
+            <div class="form-group">
+                <label for="">Имя</label>
+                <input
+                    type="text"
+                    class="form-control"
+                    placeholder="Имя"
+                    :name="'items[' + index + '][firstname]'"
+                    v-model="field.firstname"
+                />
+            </div>
+            
+            <div class="form-group">
+                <label for="">Отчество</label>
+                <input
+                    type="text"
+                    class="form-control"
+                    placeholder="Отчество"
+                    :name="'items[' + index + '][patronymic]'"
+                    v-model="field.patronymic"
+                />
+            </div>
+            
+            <div class="form-group">
+                <label for="">Email</label>
+                <input
+                    type="text"
+                    class="form-control"
+                    placeholder="Email"
+                    :name="'items[' + index + '][user_email]'"
+                    v-model="field.user_email"
+                />
+            </div>
 
             <multiselect
                 v-model="field.group"
