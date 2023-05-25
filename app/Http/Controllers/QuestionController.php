@@ -161,6 +161,7 @@ class QuestionController extends Controller
         {
             $user = Auth::user();
             $question = Question::find($id);
+
             $question->update([
                 "question_text" => $request->name,
                 "question_private" => $request->private,
@@ -170,9 +171,15 @@ class QuestionController extends Controller
                     'type' => $request->type,
                 ])
             ]);
+
+            // добавление ответов
+            foreach($request->answers as $reqAns)
+            {
+                $this->answerService($reqAns, $question);
+            }
             
             return response()->json([
-                'message' => "Сохранено"
+                'message' => "Сохранено. Обновите таблицу, чтобы увидеть удаления, если они были"
             ], Response::HTTP_OK);
         } else {
             return response()->json([
@@ -216,46 +223,44 @@ class QuestionController extends Controller
         }
     }
 
-    public function answerService($answer, $question)
+    public function answerService($answerData, $question)
     {
+        
         // если новый и сразу удалили 
-        if($answer['id'] == "__new" && $answer['isDelete'] == true)
+        if($answerData['id'] == "__new" && $answerData['isDelete'] == true)
             return;
 
         // если не новый и удалили
-        if(is_numeric($answer['id']) && $answer['isDelete'] == true)
+        if(is_numeric($answerData['id']) && $answerData['isDelete'] == true)
         {
+            $answer = Answer::find($answerData['id']);
+            
             try {
-                $answer = Answer::find($answer['id']);
                 if(isset($answer))
-                    $answer->delete();
+                    $answer->forceDelete();
             } catch(Exception $e) {
-                // return response()->json([
-                //     'status' => 'error',
-                //     'message' => "Ошибка при удалении"
-                // ], Response::HTTP_BAD_REQUEST);
+                $answer->delete();
             }
 
             return;
         }
 
-        if(is_numeric($answer['id']))
-        {
-            $answer = Answer::find($answer['id']);
+        if(is_numeric($answerData['id']))
+        {            
+            $answer = Answer::find($answerData['id']);
             $answer->update([
-                'answer_name' => $answer['text'],
-                'answer_status' => $answer['isCorrect'],
-                'question_id' => $question->id,
+                'answer_name' => $answerData['text'],
+                'answer_status' => $answerData['isCorrect']
             ]);
 
             return;
         }
 
-        if($answer['id'] == '__new')
+        if($answerData['id'] == '__new')
         {
             $answer = Answer::create([
-                'answer_name' => $answer['text'],
-                'answer_status' => $answer['isCorrect'],
+                'answer_name' => $answerData['text'],
+                'answer_status' => $answerData['isCorrect'],
                 'question_id' => $question->id,
             ]);
             return;

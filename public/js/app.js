@@ -9134,19 +9134,19 @@ __webpack_require__.r(__webpack_exports__);
         mark: this.mark,
         answers: this.answers
       }).then(function (response) {
-        this.errorText = null;
-        this.$notify({
+        _this2.errorText = null;
+        _this2.$notify({
           title: 'Добавление / редактирование вопроса',
           text: response.data.message,
           type: 'success'
         });
       })["catch"](function (error) {
-        this.$notify({
+        _this2.$notify({
           title: 'Добавление / редактирование вопроса',
           text: error.response.data.message ? error.response.data.message : "Не удалось обработать запрос",
           type: 'error'
         });
-        this.errorText = error.response.data.message ? error.response.data.message : "Не удалось обработать запрос";
+        _this2.errorText = error.response.data.message ? error.response.data.message : "Не удалось обработать запрос";
       });
     },
     getDeleteClass: function getDeleteClass(index) {

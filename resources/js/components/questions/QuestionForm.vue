@@ -201,7 +201,7 @@ export default {
                 });
             }
         },
-        send() {
+        send: function() {
             this.name = this.name.replace(/\s+/g, " ");
 
             // проверка наличия данных
@@ -251,7 +251,7 @@ export default {
                 mark: this.mark,
                 answers: this.answers
             })
-                .then(function (response) {
+                .then((response) => {
                     this.errorText = null
                     this.$notify({
                         title: 'Добавление / редактирование вопроса',
@@ -259,7 +259,7 @@ export default {
                         type: 'success',
                     });
                 })
-                .catch(function (error) {
+                .catch((error) => {
                     this.$notify({
                         title: 'Добавление / редактирование вопроса',
                         text: error.response.data.message ? error.response.data.message : "Не удалось обработать запрос",
