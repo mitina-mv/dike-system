@@ -9034,12 +9034,12 @@ __webpack_require__.r(__webpack_exports__);
   },
   data: function data() {
     return {
-      name: "",
-      privateCheck: false,
-      type: "single",
-      discipline: null,
+      name: this.question ? this.question.question_text : "",
+      privateCheck: this.question ? this.question.question_private : false,
+      type: this.question ? JSON.parse(this.question.question_settings).type : "single",
+      discipline: this.question ? this.question.discipline_id : null,
       errorText: null,
-      mark: 1,
+      mark: this.question ? this.question.mark : 1,
       types: [{
         name: "Одиночный выбор",
         code: "single"
@@ -9050,17 +9050,31 @@ __webpack_require__.r(__webpack_exports__);
         name: "Текстовый ответ",
         code: "text"
       }],
-      answers: [{
+      answers: []
+    };
+  },
+  mounted: function mounted() {
+    var _this = this;
+    if (this.question && this.question.answers) {
+      this.question.answers.forEach(function (item) {
+        _this.answers.push({
+          text: item.answer_name,
+          isCorrect: item.answer_status,
+          isDelete: false,
+          id: item.id
+        });
+      });
+    } else {
+      this.answers = [{
         text: "",
         isCorrect: true,
         isDelete: false,
         id: "__new"
-      }]
-    };
+      }];
+    }
   },
   methods: {
     addAnswer: function addAnswer() {
-      console.log(this.question);
       if (this.type == 'text') {
         this.answers.push({
           text: "",
@@ -9078,7 +9092,7 @@ __webpack_require__.r(__webpack_exports__);
       }
     },
     send: function send() {
-      var _this = this;
+      var _this2 = this;
       this.name = this.name.replace(/\s+/g, " ");
 
       // проверка наличия данных
@@ -9093,7 +9107,7 @@ __webpack_require__.r(__webpack_exports__);
       this.answers.forEach(function (item) {
         if (item.isCorrect == true && item.isDelete !== true) {
           flagCorrectAnswer = true;
-          if (_this.type == 'single') {
+          if (_this2.type == 'single') {
             ++countSimpleCorrectAnswer;
           }
         }
@@ -9120,23 +9134,39 @@ __webpack_require__.r(__webpack_exports__);
         mark: this.mark,
         answers: this.answers
       }).then(function (response) {
-        this.errorText = null;
-        this.$notify({
+        _this2.errorText = null;
+        if (!_this2.question) {
+          _this2.question = response.data.question;
+          _this2.updateAnswersCreateAfter(response.data.answers);
+        }
+        _this2.$notify({
           title: 'Добавление / редактирование вопроса',
           text: response.data.message,
           type: 'success'
         });
       })["catch"](function (error) {
-        this.$notify({
+        _this2.$notify({
           title: 'Добавление / редактирование вопроса',
           text: error.response.data.message ? error.response.data.message : "Не удалось обработать запрос",
           type: 'error'
         });
-        this.errorText = error.response.data.message ? error.response.data.message : "Не удалось обработать запрос";
+        _this2.errorText = error.response.data.message ? error.response.data.message : "Не удалось обработать запрос";
       });
     },
     getDeleteClass: function getDeleteClass(index) {
       return this.answers[index].isDelete ? "answer-item_delete" : "";
+    },
+    updateAnswersCreateAfter: function updateAnswersCreateAfter(answers) {
+      var _this3 = this;
+      this.answers = [];
+      answers.forEach(function (item) {
+        _this3.answers.push({
+          text: item.answer_name,
+          isCorrect: item.answer_status,
+          isDelete: false,
+          id: item.id
+        });
+      });
     }
   }
 });

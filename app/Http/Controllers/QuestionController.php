@@ -141,52 +141,13 @@ class QuestionController extends Controller
             // добавление ответов
             foreach($request->answers as $reqAns)
             {
-                // если новый и сразу удалили 
-                if($reqAns['id'] == "__new" && $reqAns['isDelete'] == true)
-                    continue;
-
-                // если не новый и удалили
-                if(is_numeric($reqAns['id']) && $reqAns['isDelete'] == true)
-                {
-                    try {
-                        $answer = Answer::find($reqAns['id']);
-                        if(isset($answer))
-                            $answer->delete();
-                    } catch(Exception $e) {
-                        // return response()->json([
-                        //     'status' => 'error',
-                        //     'message' => "Ошибка при удалении"
-                        // ], Response::HTTP_BAD_REQUEST);
-                    }
-
-                    continue;
-                }
-
-                if(is_numeric($reqAns['id']))
-                {
-                    $answer = Answer::find($reqAns['id']);
-                    $answer->update([
-                        'answer_name' => $reqAns['text'],
-                        'answer_status' => $reqAns['isCorrect'],
-                        'question_id' => $question->id,
-                    ]);
-
-                    continue;
-                }
-
-                if($reqAns['id'] == '__new')
-                {
-                    $answer = Answer::create([
-                        'answer_name' => $reqAns['text'],
-                        'answer_status' => $reqAns['isCorrect'],
-                        'question_id' => $question->id,
-                    ]);
-                    continue;
-                }
+                $this->answerService($reqAns, $question);
             }
 
             return response()->json([
-                'message' => "Сохранено"
+                'message' => "Сохранено",
+                'question' => $question,
+                'answers' => $question->answers()->get()
             ], Response::HTTP_OK);
         } else {
             return response()->json([
@@ -196,9 +157,47 @@ class QuestionController extends Controller
         }
     }
 
-    public function update()
+    public function update(QuestionCreateRequest $request, $id)
     {
-        # code...
+        if($this->checkRules())
+        {
+            $user = Auth::user();
+            $question = Question::find($id);
+
+            if($user->id == $question->user_id)
+            {
+                $question->update([
+                    "question_text" => $request->name,
+                    "question_private" => $request->private,
+                    "discipline_id" => $request->discipline,
+                    "mark" => $request->mark,
+                    "question_settings" => json_encode([ // TODO расширить (?)
+                        'type' => $request->type,
+                    ])
+                ]);
+    
+                // добавление ответов
+                foreach($request->answers as $reqAns)
+                {
+                    $this->answerService($reqAns, $question);
+                }
+                
+                return response()->json([
+                    'message' => "Сохранено. Обновите страницу, чтобы увидеть удаления, если они были"
+                ], Response::HTTP_OK);
+            } else {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => "Вы не имеете право редактирование вопроса"
+                ], Response::HTTP_BAD_REQUEST);
+            }
+            
+        } else {
+            return response()->json([
+                'status' => 'error',
+                'message' => "Вы не имеете право редактирование вопроса"
+            ], Response::HTTP_BAD_REQUEST);
+        }
     }
 
     public function destroy($id)
@@ -210,7 +209,20 @@ class QuestionController extends Controller
 
                 if($question->user_id == Auth::user()->id)
                 {
-                    $question->delete();
+                    foreach($question->answers()->get() as $answer){
+                        try {
+                            $answer->forceDelete();
+                        } catch(Exception $e) {
+                            $answer->delete();
+                        }
+                    }
+                    // попытка полностью удалить вопрос
+                    try {
+                        $question->forceDelete();
+                    } catch(Exception $e) {
+                        // если не получается, то ставим флаг удаления
+                        $question->delete();
+                    }
                 } else {
                     return response()->json([
                         'status' => 'error',
@@ -232,6 +244,50 @@ class QuestionController extends Controller
                 'status' => 'error',
                 'message' => "Вы не имеете право удаления этого вопроса."
             ], Response::HTTP_BAD_REQUEST);
+        }
+    }
+
+    public function answerService($answerData, $question)
+    {
+        
+        // если новый и сразу удалили 
+        if($answerData['id'] == "__new" && $answerData['isDelete'] == true)
+            return;
+
+        // если не новый и удалили
+        if(is_numeric($answerData['id']) && $answerData['isDelete'] == true)
+        {
+            $answer = Answer::find($answerData['id']);
+            
+            try {
+                if(isset($answer))
+                    $answer->forceDelete();
+            } catch(Exception $e) {
+                $answer->delete();
+            }
+
+            return;
+        }
+
+        if(is_numeric($answerData['id']))
+        {            
+            $answer = Answer::find($answerData['id']);
+            $answer->update([
+                'answer_name' => $answerData['text'],
+                'answer_status' => $answerData['isCorrect']
+            ]);
+
+            return;
+        }
+
+        if($answerData['id'] == '__new')
+        {
+            $answer = Answer::create([
+                'answer_name' => $answerData['text'],
+                'answer_status' => $answerData['isCorrect'],
+                'question_id' => $question->id,
+            ]);
+            return;
         }
     }
 }

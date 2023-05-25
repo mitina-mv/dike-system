@@ -142,12 +142,12 @@ export default {
     },
     data() {
         return {
-            name: "",
-            privateCheck: false,
-            type: "single",
-            discipline: null,
+            name: this.question ? this.question.question_text : "",
+            privateCheck: this.question ? this.question.question_private : false,
+            type: this.question ? JSON.parse(this.question.question_settings).type : "single",
+            discipline: this.question ? this.question.discipline_id :null,
             errorText: null,
-            mark: 1,
+            mark: this.question ? this.question.mark :1,
             types: [
                 {
                     name: "Одиночный выбор",
@@ -162,14 +162,29 @@ export default {
                     code: "text",
                 },
             ],
-            answers: [
-                { text: "", isCorrect: true, isDelete: false, id: "__new" },
-            ],
+            answers: [],
         };
+    },
+    mounted(){
+        if(this.question && this.question.answers)
+        {
+            this.question.answers.forEach(item => {
+                this.answers.push({
+                    text: item.answer_name,
+                    isCorrect: item.answer_status,
+                    isDelete: false,
+                    id: item.id
+                })
+            })
+        } else {
+            this.answers = [
+                { text: "", isCorrect: true, isDelete: false, id: "__new" },
+            ]
+        }
+        
     },
     methods: {
         addAnswer: function () {
-            console.log(this.question);
             if(this.type == 'text') {
                 this.answers.push({
                     text: "",
@@ -186,7 +201,7 @@ export default {
                 });
             }
         },
-        send() {
+        send: function() {
             this.name = this.name.replace(/\s+/g, " ");
 
             // проверка наличия данных
@@ -236,15 +251,19 @@ export default {
                 mark: this.mark,
                 answers: this.answers
             })
-                .then(function (response) {
+                .then((response) => {
                     this.errorText = null
+                    if(!this.question){
+                        this.question = response.data.question
+                        this.updateAnswersCreateAfter(response.data.answers)
+                    }
                     this.$notify({
                         title: 'Добавление / редактирование вопроса',
                         text: response.data.message,
                         type: 'success',
                     });
                 })
-                .catch(function (error) {
+                .catch((error) => {
                     this.$notify({
                         title: 'Добавление / редактирование вопроса',
                         text: error.response.data.message ? error.response.data.message : "Не удалось обработать запрос",
@@ -256,6 +275,17 @@ export default {
         getDeleteClass(index) {
             return this.answers[index].isDelete ? "answer-item_delete" : "";
         },
+        updateAnswersCreateAfter(answers){
+            this.answers = [];
+            answers.forEach(item => {
+                this.answers.push({
+                    text: item.answer_name,
+                    isCorrect: item.answer_status,
+                    isDelete: false,
+                    id: item.id
+                })
+            })
+        }
     },
 };
 </script>
