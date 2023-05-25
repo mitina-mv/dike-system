@@ -9135,6 +9135,10 @@ __webpack_require__.r(__webpack_exports__);
         answers: this.answers
       }).then(function (response) {
         _this2.errorText = null;
+        if (!_this2.question) {
+          _this2.question = response.data.question;
+          _this2.updateAnswersCreateAfter(response.data.answers);
+        }
         _this2.$notify({
           title: 'Добавление / редактирование вопроса',
           text: response.data.message,
@@ -9151,6 +9155,18 @@ __webpack_require__.r(__webpack_exports__);
     },
     getDeleteClass: function getDeleteClass(index) {
       return this.answers[index].isDelete ? "answer-item_delete" : "";
+    },
+    updateAnswersCreateAfter: function updateAnswersCreateAfter(answers) {
+      var _this3 = this;
+      this.answers = [];
+      answers.forEach(function (item) {
+        _this3.answers.push({
+          text: item.answer_name,
+          isCorrect: item.answer_status,
+          isDelete: false,
+          id: item.id
+        });
+      });
     }
   }
 });

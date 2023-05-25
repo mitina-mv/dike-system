@@ -253,6 +253,10 @@ export default {
             })
                 .then((response) => {
                     this.errorText = null
+                    if(!this.question){
+                        this.question = response.data.question
+                        this.updateAnswersCreateAfter(response.data.answers)
+                    }
                     this.$notify({
                         title: 'Добавление / редактирование вопроса',
                         text: response.data.message,
@@ -271,6 +275,17 @@ export default {
         getDeleteClass(index) {
             return this.answers[index].isDelete ? "answer-item_delete" : "";
         },
+        updateAnswersCreateAfter(answers){
+            this.answers = [];
+            answers.forEach(item => {
+                this.answers.push({
+                    text: item.answer_name,
+                    isCorrect: item.answer_status,
+                    isDelete: false,
+                    id: item.id
+                })
+            })
+        }
     },
 };
 </script>

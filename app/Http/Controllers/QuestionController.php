@@ -145,7 +145,9 @@ class QuestionController extends Controller
             }
 
             return response()->json([
-                'message' => "Сохранено"
+                'message' => "Сохранено",
+                'question' => $question,
+                'answers' => $question->answers()->get()
             ], Response::HTTP_OK);
         } else {
             return response()->json([
@@ -162,25 +164,34 @@ class QuestionController extends Controller
             $user = Auth::user();
             $question = Question::find($id);
 
-            $question->update([
-                "question_text" => $request->name,
-                "question_private" => $request->private,
-                "discipline_id" => $request->discipline,
-                "mark" => $request->mark,
-                "question_settings" => json_encode([ // TODO расширить (?)
-                    'type' => $request->type,
-                ])
-            ]);
-
-            // добавление ответов
-            foreach($request->answers as $reqAns)
+            if($user->id == $question->user_id)
             {
-                $this->answerService($reqAns, $question);
+                $question->update([
+                    "question_text" => $request->name,
+                    "question_private" => $request->private,
+                    "discipline_id" => $request->discipline,
+                    "mark" => $request->mark,
+                    "question_settings" => json_encode([ // TODO расширить (?)
+                        'type' => $request->type,
+                    ])
+                ]);
+    
+                // добавление ответов
+                foreach($request->answers as $reqAns)
+                {
+                    $this->answerService($reqAns, $question);
+                }
+                
+                return response()->json([
+                    'message' => "Сохранено. Обновите страницу, чтобы увидеть удаления, если они были"
+                ], Response::HTTP_OK);
+            } else {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => "Вы не имеете право редактирование вопроса"
+                ], Response::HTTP_BAD_REQUEST);
             }
             
-            return response()->json([
-                'message' => "Сохранено. Обновите таблицу, чтобы увидеть удаления, если они были"
-            ], Response::HTTP_OK);
         } else {
             return response()->json([
                 'status' => 'error',
@@ -198,7 +209,20 @@ class QuestionController extends Controller
 
                 if($question->user_id == Auth::user()->id)
                 {
-                    $question->delete();
+                    foreach($question->answers()->get() as $answer){
+                        try {
+                            $answer->forceDelete();
+                        } catch(Exception $e) {
+                            $answer->delete();
+                        }
+                    }
+                    // попытка полностью удалить вопрос
+                    try {
+                        $question->forceDelete();
+                    } catch(Exception $e) {
+                        // если не получается, то ставим флаг удаления
+                        $question->delete();
+                    }
                 } else {
                     return response()->json([
                         'status' => 'error',
