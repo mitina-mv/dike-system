@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AssignmentController;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\OrgController;
@@ -89,6 +90,19 @@ Route::group(['middleware' => ['auth']], function() {
         Route::get('/{id}', [TestController::class, 'read'])->name('tests.read');
         Route::post('/{id}', [TestController::class, 'update'])->name('tests.update');
         Route::delete('/{id}', [TestController::class, 'destroy'])->name('tests.delete');
+    });
+
+    // назначение тестирований
+    Route::group(['prefix' => 'assignment'], function() {
+        // все, что когда либо назначали
+        Route::get('/', [AssignmentController::class, 'index'])->name('assignment.index');
+        
+        // форма назначения - отдать всех пользователей по группам
+        Route::get('/create', [AssignmentController::class, 'formCreate'])->name('assignment.formCreate');
+        Route::post('/create', [AssignmentController::class, 'create'])->name('assignment.create');
+
+        // менять нельзя, только удалять
+        Route::delete('/{id}', [AssignmentController::class, 'destroy'])->name('assignment.delete');
     });
 });
 // 
