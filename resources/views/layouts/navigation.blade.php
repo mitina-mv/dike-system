@@ -17,9 +17,11 @@
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                    <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.index')">
-                        {{ __('Пользователи') }}
-                    </x-nav-link>
+                    @if (Auth::user()->role_id == Role::ROLE_ADMIN)                        
+                        <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.index')">
+                            {{ __('Пользователи') }}
+                        </x-nav-link>
+                    @endif
 
                     @if (Auth::user()->role_id != Role::ROLE_STUDENT)                        
                         <x-nav-link :href="route('question.index')" :active="request()->routeIs('question.index')">
