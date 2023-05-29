@@ -17,6 +17,9 @@ Vue.use(VueTabulator);
 import VueFormulate from '@braid/vue-formulate'
 Vue.use(VueFormulate)
 
+import vmodal from 'vue-js-modal'
+Vue.use(vmodal)
+
 /**
  * The following block of code may be used to automatically register your
  * Vue components. It will recursively scan this directory for the Vue
@@ -30,11 +33,6 @@ Vue.use(VueFormulate)
 // import { library } from '@fortawesome/fontawesome-svg-core'
 // import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 // Vue.component('font-awesome-icon', FontAwesomeIcon);
-
-Vue.component(
-    'example-component', 
-    require('./components/ExampleComponent.vue').default
-);
 
 import TeacherForm from './components/TeacherForm.vue';
 Vue.component('teacher-form', TeacherForm);
@@ -62,6 +60,12 @@ Vue.component('table-filter-discipline', TableFilterDiscipline)
 
 import TestForm from './components/tests/TestForm.vue'
 Vue.component('test-form', TestForm)
+
+import AssignmentTable from './components/assignment/Table.vue'
+Vue.component('assignment-table', AssignmentTable)
+
+import AssignmentForm from './components/assignment/Form.vue'
+Vue.component('assignment-form', AssignmentForm)
 
 
 /**

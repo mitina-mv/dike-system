@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AssignmentController;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\OrgController;
@@ -8,6 +9,8 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\DisciplineController;
 use App\Http\Controllers\TestController;
+use App\Models\Role;
+use Illuminate\Support\Facades\Auth;
 
 /*
 |--------------------------------------------------------------------------
@@ -89,6 +92,25 @@ Route::group(['middleware' => ['auth']], function() {
         Route::get('/{id}', [TestController::class, 'read'])->name('tests.read');
         Route::post('/{id}', [TestController::class, 'update'])->name('tests.update');
         Route::delete('/{id}', [TestController::class, 'destroy'])->name('tests.delete');
+    });
+
+    // назначение тестирований
+    Route::group(['prefix' => 'assignment'], function() {
+        // все, что когда либо назначали
+        Route::get('/', [AssignmentController::class, 'index'])->name('assignment.index');
+        Route::get('/{year}', [AssignmentController::class, 'list'])->where('year', '[0-9]+');
+
+        // список студентов, кому назначен тест
+        Route::get('/{test_id}/{date}', [AssignmentController::class, 'read']);
+        // удаление всего назначения 
+        Route::delete('/{test_id}/{date}', [AssignmentController::class, 'destroyAll']);
+        
+        // форма назначения - отдать всех пользователей по группам
+        Route::get('/create', [AssignmentController::class, 'formCreate'])->name('assignment.formCreate');
+        Route::post('/create', [AssignmentController::class, 'create'])->name('assignment.create');
+
+        // менять нельзя, только удалять
+        Route::delete('/{id}', [AssignmentController::class, 'destroy'])->name('assignment.delete');
     });
 });
 // 

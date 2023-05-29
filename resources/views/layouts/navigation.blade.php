@@ -36,7 +36,7 @@
                     @endif
 
                     @if (Auth::user()->role_id == Role::ROLE_TEACHER)                        
-                        <x-nav-link :href="route('tests.index')" :active="request()->routeIs('tests.index')">
+                        <x-nav-link :href="route('assignment.index')" :active="request()->routeIs('assignment.index')">
                             {{ __('Назначение тестирования') }}
                         </x-nav-link>
                     @endif
