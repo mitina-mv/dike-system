@@ -8855,7 +8855,26 @@ __webpack_require__.r(__webpack_exports__);
 //
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
-  props: ['discipline', 'tabledata', 'url', 'columns', 'addactions'],
+  props: {
+    discipline: {
+      required: false
+    },
+    tabledata: {
+      required: false
+    },
+    url: {
+      required: false
+    },
+    columns: {
+      required: false
+    },
+    addactions: {
+      required: false
+    },
+    hideaddedbuttons: {
+      required: false
+    }
+  },
   data: function data() {
     return {
       // TODO фу кака
@@ -8864,12 +8883,13 @@ __webpack_require__.r(__webpack_exports__);
         columns: this.columns,
         layout: "fitColumns",
         height: "auto"
-      }
+      },
+      hidebuttons: this.hideaddedbuttons ? true : false
     };
   },
   mounted: function mounted() {
     var _this = this;
-    if (this.addactions) {
+    if (this.addactions && this.addactions != 'report') {
       this.columns.push({
         formatter: function formatter(cell) {
           var data = cell.getRow().getData();
@@ -8904,6 +8924,16 @@ __webpack_require__.r(__webpack_exports__);
             });
           });
         }
+      });
+    } else if (this.addactions == 'report') {
+      this.columns.push({
+        formatter: function formatter(cell) {
+          var data = cell.getRow().getData();
+          if (data.active_test) return "<a\n                            href=\"".concat(_this.url, "/").concat(data.id, "\"\n                            class=\"btn btn-outline-success\"\n                        >\n                            \u041F\u0440\u043E\u0439\u0442\u0438 \u0442\u0435\u0441\u0442\u0438\u0440\u043E\u0432\u0430\u043D\u0438\u0435\n                        </a>");else if (data.get_report) return "<a\n                                href=\"/student-test/".concat(data.id, "\"\n                                class=\"btn btn-outline-success\"\n                            >\n                                \u041E\u0442\u0447\u0435\u0442\n                            </a>");
+        },
+        hozAlign: "center",
+        headerSort: false,
+        width: 150
       });
     }
   },
@@ -58154,23 +58184,30 @@ var render = function () {
             )
           }),
           _vm._v(" "),
-          _c(
-            "a",
-            { staticClass: "btn btn-primary", attrs: { href: "/discipline/" } },
-            [_vm._v("+ Добавить дисциплину")]
-          ),
+          !_vm.hidebuttons
+            ? _c(
+                "a",
+                {
+                  staticClass: "btn btn-primary",
+                  attrs: { href: "/discipline/" },
+                },
+                [_vm._v("+ Добавить дисциплину")]
+              )
+            : _vm._e(),
         ],
         2
       ),
       _vm._v(" "),
-      _c(
-        "a",
-        {
-          staticClass: "btn btn-success",
-          attrs: { href: _vm.url + "/create" },
-        },
-        [_vm._v("+ Создать")]
-      ),
+      !_vm.hidebuttons
+        ? _c(
+            "a",
+            {
+              staticClass: "btn btn-success",
+              attrs: { href: _vm.url + "/create" },
+            },
+            [_vm._v("+ Создать")]
+          )
+        : _vm._e(),
       _vm._v(" "),
       _c("VueTabulator", {
         attrs: { options: _vm.options },

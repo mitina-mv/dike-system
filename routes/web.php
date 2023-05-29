@@ -8,6 +8,7 @@ use App\Http\Controllers\UsersController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\DisciplineController;
+use App\Http\Controllers\StudentTestController;
 use App\Http\Controllers\TestController;
 use App\Models\Role;
 use Illuminate\Support\Facades\Auth;
@@ -111,6 +112,25 @@ Route::group(['middleware' => ['auth']], function() {
 
         // менять нельзя, только удалять
         Route::delete('/{id}', [AssignmentController::class, 'destroy'])->name('assignment.delete');
+    });
+
+    // список тестирований
+    Route::group(['prefix' => 'student-test'], function() {
+        // все назначения (фильтра по дисциплинам)
+        Route::get('/', [StudentTestController::class, 'index'])->name('studenttest.index');
+
+        // получить результат - формирование отчета
+        Route::get('/getReport/{testlog_id}', [StudentTestController::class, 'getReport']);
+    });
+
+    //само тестирование студента
+    Route::group(['prefix' => 'testing'], function() {
+        // /{answerlog_id} - для получения вопроса
+        // все назначения (фильтра по дисциплинам)
+        // Route::get('/', [StudentTestController::class, 'index'])->name('studenttest.index');
+
+        // // получить результат - формирование отчета
+        // Route::get('/{testlog_id}', [StudentTestController::class, 'getReport']);
     });
 });
 // 

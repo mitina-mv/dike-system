@@ -40,6 +40,12 @@
                             {{ __('Назначение тестирования') }}
                         </x-nav-link>
                     @endif
+
+                    @if (Auth::user()->role_id == Role::ROLE_STUDENT)                        
+                        <x-nav-link :href="route('studenttest.index')" :active="request()->routeIs('studenttest.index')">
+                            {{ __('Мои тестирования') }}
+                        </x-nav-link>
+                    @endif
                 </div>
             </div>
 
