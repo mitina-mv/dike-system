@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Studgroup;
+use App\Models\Test;
 use App\Models\Testlog;
 use DateTime;
 use Exception;
@@ -135,8 +137,22 @@ class AssignmentController extends Controller
 
     public function formCreate()
     {
-        # code...
+        $user = Auth::user();
+        
+        // список доступныех тестов
+        $tests = Test::where([
+            'user_id' => $user->id
+        ])->get()->all();
+
+        // получение групп, у которых преподаем
+        // и их студентов
+        $studgroups = $user->studgroups()
+            ->with('students')
+            ->get()->all();
+
+        return view('assignment.form', compact('studgroups', 'tests'));
     }
+
     public function create()
     {
         # code...

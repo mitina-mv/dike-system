@@ -9,6 +9,8 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\DisciplineController;
 use App\Http\Controllers\TestController;
+use App\Models\Role;
+use Illuminate\Support\Facades\Auth;
 
 /*
 |--------------------------------------------------------------------------
@@ -96,7 +98,7 @@ Route::group(['middleware' => ['auth']], function() {
     Route::group(['prefix' => 'assignment'], function() {
         // все, что когда либо назначали
         Route::get('/', [AssignmentController::class, 'index'])->name('assignment.index');
-        Route::get('/{year}', [AssignmentController::class, 'list']);
+        Route::get('/{year}', [AssignmentController::class, 'list'])->where(['year' => 'integer']);
 
         // список студентов, кому назначен тест
         Route::get('/{test_id}/{date}', [AssignmentController::class, 'read']);

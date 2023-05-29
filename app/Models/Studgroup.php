@@ -11,7 +11,12 @@ class Studgroup extends Model
 
     public function users()
     {
-        return $this->belongsToMany(User::class);
+        return $this->belongsToMany(User::class, 'user_studgroup');
+    }
+
+    public function students()
+    {
+        return $this->hasMany(User::class, 'studgroup_id', 'id');
     }
 
     public function org()
