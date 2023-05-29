@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Testlog;
+use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -18,15 +19,15 @@ class AssignmentController extends Controller
         ])
         ->select(
             DB::raw("to_char(testlog_date, 'YYYY') as year"),
-            DB::raw("count(test_id) as count_test"),
+            DB::raw("count(id) as count_test"),
         )
         ->orderBy('year')
         ->groupBy(
-            DB::raw("to_char(testlog_date, 'YYYY')"),
+            'year'
         )
         ->get()
         ->toArray();
-            
+        
         return view('assignment.index', compact('yearsTestLog'));
     }
 
@@ -57,7 +58,7 @@ class AssignmentController extends Controller
         ->select(
             'test_id',
             'testlog_date',
-            'studgroups.studgroup_name'
+            'studgroups.studgroup_name',
         )
         ->join('users', 'users.id', '=', 'testlogs.user_id')
         ->join('studgroups', 'users.studgroup_id', '=', 'studgroups.id')
@@ -76,10 +77,16 @@ class AssignmentController extends Controller
 
         foreach($testLogs as &$testLog)
         {
-            $testLog['groups'] = array_unique($testLog['groups']);
+            $testLog['groups'] = implode(
+                ", ", 
+                array_unique($testLog['groups'])
+            );
+            $testLog['format-date'] = (new DateTime($testLog['testlog_date']))->format('Y-m-d H:i');
+
+            $arResult[] = $testLog;
         }
 
-        return response()->json($testLogs, Response::HTTP_OK);
+        return response()->json($arResult, Response::HTTP_OK);
     }
     
     public function read($test_id, $date){

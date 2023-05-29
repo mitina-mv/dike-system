@@ -13,7 +13,12 @@
                     <?= $error?>
                 @else
                     <div id="app">
-                        
+                        <assignment-table
+                            :years='@json($yearsTestLog)'
+                            @if(isset($yearsTestLog[0]))
+                                :yearstart='<?= $yearsTestLog[0]['year']?>'
+                            @endif
+                        ></assignment-table>
                         <notifications/>
                     </div>
                 @endif

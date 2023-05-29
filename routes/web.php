@@ -97,7 +97,11 @@ Route::group(['middleware' => ['auth']], function() {
         // все, что когда либо назначали
         Route::get('/', [AssignmentController::class, 'index'])->name('assignment.index');
         Route::get('/{year}', [AssignmentController::class, 'list']);
+
+        // список студентов, кому назначен тест
         Route::get('/{test_id}/{date}', [AssignmentController::class, 'read']);
+        // удаление всего назначения 
+        Route::delete('/{test_id}/{date}', [AssignmentController::class, 'destroyAll']);
         
         // форма назначения - отдать всех пользователей по группам
         Route::get('/create', [AssignmentController::class, 'formCreate'])->name('assignment.formCreate');
