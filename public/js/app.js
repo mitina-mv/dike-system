@@ -9191,9 +9191,9 @@ __webpack_require__.r(__webpack_exports__);
   methods: {
     getTestList: function getTestList(year) {
       var _this2 = this;
-      this.curYear = year;
-      axios.get("/assignment/" + this.curYear).then(function (response) {
+      axios.get("/assignment/" + year).then(function (response) {
         _this2.testList = response.data;
+        _this2.curYear = year;
       })["catch"](function (error) {
         _this2.$notify({
           title: "Получение списка тестов",

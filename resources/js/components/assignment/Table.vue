@@ -155,12 +155,11 @@ export default {
     },
     methods: {
         getTestList(year) {
-            this.curYear = year;
-
             axios
-                .get("/assignment/" + this.curYear)
+                .get("/assignment/" + year)
                 .then((response) => {
                     this.testList = response.data;
+                    this.curYear = year;
                 })
                 .catch((error) => {
                     this.$notify({
