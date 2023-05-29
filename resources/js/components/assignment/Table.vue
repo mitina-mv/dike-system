@@ -186,10 +186,6 @@ export default {
         },
         closeModal() {
             this.$modal.hide("my-first-modal");
-        },
-        deleteAssignment(data)
-        {
-            
         }
     },
 };

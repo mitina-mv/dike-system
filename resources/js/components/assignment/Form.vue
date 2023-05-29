@@ -33,6 +33,7 @@
                 />
                 <FormulateInput
                     type="datetime-local"
+                    v-model="date"
                     label="Дата / время проведения тестирования"
                     validation="required"
                 />
@@ -64,8 +65,10 @@ export default {
         return {
             studgroupsCheck: [],
             studentsCheck: [],
+            url: "/assignment",
             studentsOptions: [],
-            testId: null
+            testId: null,
+            date: null
         };
     },
     mounted() 
@@ -99,7 +102,31 @@ export default {
         }, 
         send()
         {
+            // удаляю _ из id
+            let ids = [];
+            this.studentsCheck.forEach(id => {
+                ids.push(Number(id.replace(/_/gi, '')))
+            })
 
+            axios.post(
+                this.url + '/create', 
+                {
+                    users: ids,
+                    test: this.testId,
+                    date: this.date,
+                }
+            )
+            .then((res) => {
+                this.usersList = res.data;
+                this.$modal.show("my-first-modal");
+            })
+            .catch((error) => {
+                this.$notify({
+                    title: "Получение списка студентов",
+                    text: "Не удалось обработать запрос",
+                    type: "error",
+                });
+            });
         }
     }
 };

@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Answerlog;
+use App\Models\Question;
+use App\Models\Role;
 use App\Models\Studgroup;
 use App\Models\Test;
 use App\Models\Testlog;
+use App\Models\User;
 use DateTime;
 use Exception;
 use Illuminate\Http\Request;
@@ -65,7 +69,8 @@ class AssignmentController extends Controller
         $usersIdTestLogs = Testlog::where([
             'teacher_id' => Auth::user()->id,
         ])
-        ->where(DB::raw("to_char(testlog_date, 'YYYY')"), '=', $year)
+        ->whereYear('testlog_date', $year)
+        // ->where(DB::raw("to_char(testlog_date, 'YYYY')"), '=', $year)
         ->select(
             'test_id',
             'testlog_date',
@@ -176,9 +181,75 @@ class AssignmentController extends Controller
         return view('assignment.form', compact('studgroups', 'tests'));
     }
 
-    public function create()
+    public function create(Request $request)
     {
-        # code...
+        try {
+            DB::transaction(function() use ($request) {
+                // получаем пользователей по id
+                $students = User::where([
+                    'id' => $request->users,
+                    'role_id' => Role::ROLE_STUDENT
+                ])->get()->all();
+
+                if(empty($students)){
+                    throw new Exception("Пользователи не определены.");
+                }
+    
+                // информация о тесте
+                $test = Test::find($request->test);
+                // $countQuestion = json_decode($test->test_settings, false)->question_count;
+                $countQuestion = 2;
+
+                foreach($students as $user)
+                {
+                    // по дисциплине и количеству вопросов забираем
+                    // рандомные <countQuestion> вопросов
+                    $questions = Question::where([
+                        ['question_private',  "=",  false],
+                        ['discipline_id',  "=", $test->discipline_id],
+                    ])
+                    ->orWhere([
+                        ['question_private',  "=",  true],
+                        ['discipline_id',  "=", $test->discipline_id],
+                        ['user_id',  "=", Auth::user()->id],
+                    ])
+                    ->inRandomOrder()
+                    ->limit($countQuestion)
+                    ->get()->all();
+        
+                    if(($count = count($questions)) !== $countQuestion)
+                    {
+                        throw new Exception("Подготовьте банк вопросов на эту тему. На текущий момент требуется {$countQuestion} из них найдено {$count}");
+                    }
+        
+                    // создаем testlog
+                    $testLog = Testlog::create([
+                        'testlog_date' => new DateTime($request->date),
+                        'user_id' => $user->id,
+                        'test_id' => $test->id,
+                        'teacher_id' => Auth::user()->id,
+                    ]);
+        
+                    // создаем answerlog
+                    foreach($questions as $q)
+                    {
+                        $answerLog = Answerlog::create([
+                            'question_id' => $q->id,
+                            'testlog_id' => $testLog->id
+                        ]);
+                    }
+                }
+            });
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        return response()->json([
+            'message' => 'Все добавлено!'
+        ], Response::HTTP_OK);
     }
 
 

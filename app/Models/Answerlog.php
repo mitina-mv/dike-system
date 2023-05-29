@@ -9,6 +9,11 @@ class Answerlog extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'question_id',
+        'testlog_id'
+    ];
+
     public function answers()
     {
         return $this->belongsToMany(Answer::class);

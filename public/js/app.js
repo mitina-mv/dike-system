@@ -9104,6 +9104,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
@@ -9119,8 +9120,10 @@ __webpack_require__.r(__webpack_exports__);
     return {
       studgroupsCheck: [],
       studentsCheck: [],
+      url: "/assignment",
       studentsOptions: [],
-      testId: null
+      testId: null,
+      date: null
     };
   },
   mounted: function mounted() {
@@ -9149,7 +9152,28 @@ __webpack_require__.r(__webpack_exports__);
         });
       }
     },
-    send: function send() {}
+    send: function send() {
+      var _this2 = this;
+      // удаляю _ из id
+      var ids = [];
+      this.studentsCheck.forEach(function (id) {
+        ids.push(Number(id.replace(/_/gi, '')));
+      });
+      axios.post(this.url + '/create', {
+        users: ids,
+        test: this.testId,
+        date: this.date
+      }).then(function (res) {
+        _this2.usersList = res.data;
+        _this2.$modal.show("my-first-modal");
+      })["catch"](function (error) {
+        _this2.$notify({
+          title: "Получение списка студентов",
+          text: "Не удалось обработать запрос",
+          type: "error"
+        });
+      });
+    }
   }
 });
 
@@ -9332,8 +9356,7 @@ __webpack_require__.r(__webpack_exports__);
     },
     closeModal: function closeModal() {
       this.$modal.hide("my-first-modal");
-    },
-    deleteAssignment: function deleteAssignment(data) {}
+    }
   }
 });
 
@@ -58456,6 +58479,13 @@ var render = function () {
                         type: "datetime-local",
                         label: "Дата / время проведения тестирования",
                         validation: "required",
+                      },
+                      model: {
+                        value: _vm.date,
+                        callback: function ($$v) {
+                          _vm.date = $$v
+                        },
+                        expression: "date",
                       },
                     }),
                     _vm._v(" "),
