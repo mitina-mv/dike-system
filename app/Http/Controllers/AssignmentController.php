@@ -142,14 +142,37 @@ class AssignmentController extends Controller
         // список доступныех тестов
         $tests = Test::where([
             'user_id' => $user->id
-        ])->get()->all();
+        ])
+        ->select('id', 'test_name')
+        ->pluck('test_name', 'id');
 
         // получение групп, у которых преподаем
         // и их студентов
-        $studgroups = $user->studgroups()
+        $tmpstudgroups = $user->studgroups()
             ->with('students')
-            ->get()->all();
+            ->get()->toArray();
+        
+        if(empty($tmpstudgroups) || empty($tests))
+        {
+            $error = 'У вас пока нет тестов или не привязаны группы. Создайте шаблоны тестов. Если проблема не решается, обратитесь к администратору от организации.';
+            return view('assignment.form', compact('studgroups', 'tests'));
+        }
 
+        $studgroups = [];
+        foreach($tmpstudgroups as $studgroup)
+        {
+            $item = [];
+            $item['name'] = $studgroup['studgroup_name'];
+
+            foreach($studgroup['students'] as $student)
+            {
+                $item['students']["_" . $student['id']] = "{$student['user_lastname']} {$student['user_firstname']} {$student['user_patronymic']}";
+            }
+
+            $studgroups[$studgroup['id']] = $item;
+        }
+
+        // dd($studgroups);
         return view('assignment.form', compact('studgroups', 'tests'));
     }
 

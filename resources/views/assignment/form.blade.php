@@ -13,7 +13,10 @@
                     <?= $error?>
                 @else
                     <div id="app">
-                        
+                        <assignment-form
+                            :studgroups='@json($studgroups)'
+                            :tests='@json($tests)'
+                        ></assignment-form>
                         <notifications/>
                     </div>
                 @endif

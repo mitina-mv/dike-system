@@ -16,7 +16,7 @@ class Studgroup extends Model
 
     public function students()
     {
-        return $this->hasMany(User::class, 'studgroup_id', 'id');
+        return $this->hasMany(User::class, 'studgroup_id', 'id')->orderBy('user_lastname');
     }
 
     public function org()
