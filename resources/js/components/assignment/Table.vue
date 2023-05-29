@@ -1,30 +1,31 @@
 <template>
     <div>
-        <div class="years-block" v-if="years">
-            <div
-                class="year-button btn"
-                :class="
-                    year.year == curYear
-                        ? 'btn-secondary'
-                        : 'btn-outline-secondary'
-                "
-                v-for="(year, index) in years"
-                :key="index"
-                @click="getTestList(year.year)"
-            >
-                {{ year.year }} ({{ year.count_test }})
+        <div class="d-flex mb-3">
+            <div class="years-block" v-if="years">
+                <div
+                    class="year-button btn me-2"
+                    :class="
+                        year.year == curYear
+                            ? 'btn-secondary'
+                            : 'btn-outline-secondary'
+                    "
+                    v-for="(year, index) in years"
+                    :key="index"
+                    @click="getTestList(year.year)"
+                >
+                    {{ year.year }} ({{ year.count_test }})
+                </div>
             </div>
-        </div>
-        <div class="" v-else>Вы пока не назначили ни один тест</div>
+            <div class="" v-else>Вы пока не назначили ни один тест</div>
 
-        <a href="/assignment/create" class="btn btn-primary"
-            >Назначить тестирование
-        </a>
+            <a href="/assignment/create" class="btn btn-primary"
+                >Назначить тестирование
+            </a>
+        </div>
 
         <VueTabulator v-model="testList" :options="options" />
 
         <modal name="my-first-modal">
-
             <div class="modal-head">
                 <h5 class="h5">Студенты, которым назначен тест</h5>
                 <button @click="closeModal" class="btn-close"></button>
@@ -44,7 +45,11 @@
                                 v-for="(user, ind) in item.users"
                                 :key="ind"
                             >
-                                <b class="user-lastname">{{ user.user_lastname }}</b> {{ user.user_firstname }}  {{ user.user_patronymic }}
+                                <b class="user-lastname">{{
+                                    user.user_lastname
+                                }}</b>
+                                {{ user.user_firstname }}
+                                {{ user.user_patronymic }}
                             </div>
                         </div>
                     </div>
@@ -82,8 +87,7 @@ export default {
                     {
                         title: "Дата / время тестирования",
                         field: "format-date",
-                        sorter: "date",
-                        formatter: "date",
+                        sorter: "text",
                         width: 200,
                     },
                     {
@@ -124,7 +128,9 @@ export default {
                             let data = cell.getRow().getData();
 
                             axios
-                                .delete(`${this.url}/${data.test_id}/${data.testlog_date}`)
+                                .delete(
+                                    `${this.url}/${data.test_id}/${data.testlog_date}`
+                                )
                                 .then((res) => {
                                     this.$notify({
                                         title: "Удаление назначения",
@@ -186,7 +192,7 @@ export default {
         },
         closeModal() {
             this.$modal.hide("my-first-modal");
-        }
+        },
     },
 };
 </script>
@@ -203,6 +209,10 @@ export default {
 
 .vm--modal {
     padding: 20px;
+}
+.modal-body {
+    height: 220px;
+    overflow-y: auto;
 }
 
 .group-name {

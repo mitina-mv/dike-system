@@ -69,8 +69,8 @@ class AssignmentController extends Controller
         $usersIdTestLogs = Testlog::where([
             'teacher_id' => Auth::user()->id,
         ])
-        ->whereYear('testlog_date', $year)
-        // ->where(DB::raw("to_char(testlog_date, 'YYYY')"), '=', $year)
+        // ->whereYear('testlog_date', $year)
+        ->where(DB::raw("to_char(testlog_date, 'YYYY')"), '=', $year)
         ->select(
             'test_id',
             'testlog_date',
@@ -186,10 +186,8 @@ class AssignmentController extends Controller
         try {
             DB::transaction(function() use ($request) {
                 // получаем пользователей по id
-                $students = User::where([
-                    'id' => $request->users,
-                    'role_id' => Role::ROLE_STUDENT
-                ])->get()->all();
+                $students = User::whereIn('id', $request->users)
+                ->get()->all();
 
                 if(empty($students)){
                     throw new Exception("Пользователи не определены.");
@@ -197,8 +195,7 @@ class AssignmentController extends Controller
     
                 // информация о тесте
                 $test = Test::find($request->test);
-                // $countQuestion = json_decode($test->test_settings, false)->question_count;
-                $countQuestion = 2;
+                $countQuestion = json_decode($test->test_settings, false)->question_count;
 
                 foreach($students as $user)
                 {

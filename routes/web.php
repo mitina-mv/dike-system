@@ -98,7 +98,7 @@ Route::group(['middleware' => ['auth']], function() {
     Route::group(['prefix' => 'assignment'], function() {
         // все, что когда либо назначали
         Route::get('/', [AssignmentController::class, 'index'])->name('assignment.index');
-        Route::get('/{year}', [AssignmentController::class, 'list'])->where(['year' => 'integer']);
+        Route::get('/{year}', [AssignmentController::class, 'list'])->where('year', '[0-9]+');
 
         // список студентов, кому назначен тест
         Route::get('/{test_id}/{date}', [AssignmentController::class, 'read']);

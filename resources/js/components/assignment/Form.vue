@@ -117,13 +117,16 @@ export default {
                 }
             )
             .then((res) => {
-                this.usersList = res.data;
-                this.$modal.show("my-first-modal");
+                this.$notify({
+                    title: "Назначение тестирования",
+                    text: "Назначено успешно!",
+                    type: "success",
+                });
             })
             .catch((error) => {
                 this.$notify({
                     title: "Получение списка студентов",
-                    text: "Не удалось обработать запрос",
+                    text: error.response.data.message,
                     type: "error",
                 });
             });

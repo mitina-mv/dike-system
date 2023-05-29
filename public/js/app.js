@@ -9164,12 +9164,15 @@ __webpack_require__.r(__webpack_exports__);
         test: this.testId,
         date: this.date
       }).then(function (res) {
-        _this2.usersList = res.data;
-        _this2.$modal.show("my-first-modal");
+        _this2.$notify({
+          title: "Назначение тестирования",
+          text: "Назначено успешно!",
+          type: "success"
+        });
       })["catch"](function (error) {
         _this2.$notify({
           title: "Получение списка студентов",
-          text: "Не удалось обработать запрос",
+          text: error.response.data.message,
           type: "error"
         });
       });
@@ -9190,6 +9193,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+//
+//
+//
+//
+//
 //
 //
 //
@@ -9273,8 +9281,7 @@ __webpack_require__.r(__webpack_exports__);
         }, {
           title: "Дата / время тестирования",
           field: "format-date",
-          sorter: "date",
-          formatter: "date",
+          sorter: "text",
           width: 200
         }, {
           title: "Группы студентов",
@@ -15341,7 +15348,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.modal-head {\r\n    display: flex;\r\n    align-items: center;\r\n    justify-content: space-between;\r\n    padding-bottom: 10px;\r\n    border-bottom: 1px solid var(--bs-border-color);\r\n    margin-bottom: 10px;\n}\n.vm--modal {\r\n    padding: 20px;\n}\n.group-name {\r\n    padding: 8px;\r\n    background: #e1ffe2;\r\n    font-weight: 700;\n}\n.group__user-item {\r\n    padding: 6px;\r\n    counter-increment: css-counter 1;\r\n    padding-left: 30px;\n}\n.group__user-list {\r\n    counter-reset: css-counter 0;\r\n    list-style-type: none;\n}\n.group__user-item:after {\r\n    content: counter(css-counter);\r\n    left: 10px;\r\n    position: absolute;\r\n    font-weight: 700;\r\n    color: var(--bs-success);\n}\nb.user-lastname {\r\n    color: var(--bs-success);\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.modal-head {\r\n    display: flex;\r\n    align-items: center;\r\n    justify-content: space-between;\r\n    padding-bottom: 10px;\r\n    border-bottom: 1px solid var(--bs-border-color);\r\n    margin-bottom: 10px;\n}\n.vm--modal {\r\n    padding: 20px;\n}\n.modal-body {\r\n    height: 220px;\r\n    overflow-y: auto;\n}\n.group-name {\r\n    padding: 8px;\r\n    background: #e1ffe2;\r\n    font-weight: 700;\n}\n.group__user-item {\r\n    padding: 6px;\r\n    counter-increment: css-counter 1;\r\n    padding-left: 30px;\n}\n.group__user-list {\r\n    counter-reset: css-counter 0;\r\n    list-style-type: none;\n}\n.group__user-item:after {\r\n    content: counter(css-counter);\r\n    left: 10px;\r\n    position: absolute;\r\n    font-weight: 700;\r\n    color: var(--bs-success);\n}\nb.user-lastname {\r\n    color: var(--bs-success);\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -58535,49 +58542,51 @@ var render = function () {
   return _c(
     "div",
     [
-      _vm.years
-        ? _c(
-            "div",
-            { staticClass: "years-block" },
-            _vm._l(_vm.years, function (year, index) {
-              return _c(
-                "div",
-                {
-                  key: index,
-                  staticClass: "year-button btn",
-                  class:
-                    year.year == _vm.curYear
-                      ? "btn-secondary"
-                      : "btn-outline-secondary",
-                  on: {
-                    click: function ($event) {
-                      return _vm.getTestList(year.year)
+      _c("div", { staticClass: "d-flex mb-3" }, [
+        _vm.years
+          ? _c(
+              "div",
+              { staticClass: "years-block" },
+              _vm._l(_vm.years, function (year, index) {
+                return _c(
+                  "div",
+                  {
+                    key: index,
+                    staticClass: "year-button btn me-2",
+                    class:
+                      year.year == _vm.curYear
+                        ? "btn-secondary"
+                        : "btn-outline-secondary",
+                    on: {
+                      click: function ($event) {
+                        return _vm.getTestList(year.year)
+                      },
                     },
                   },
-                },
-                [
-                  _vm._v(
-                    "\n            " +
-                      _vm._s(year.year) +
-                      " (" +
-                      _vm._s(year.count_test) +
-                      ")\n        "
-                  ),
-                ]
-              )
-            }),
-            0
-          )
-        : _c("div", {}, [_vm._v("Вы пока не назначили ни один тест")]),
-      _vm._v(" "),
-      _c(
-        "a",
-        {
-          staticClass: "btn btn-primary",
-          attrs: { href: "/assignment/create" },
-        },
-        [_vm._v("Назначить тестирование\n    ")]
-      ),
+                  [
+                    _vm._v(
+                      "\n                " +
+                        _vm._s(year.year) +
+                        " (" +
+                        _vm._s(year.count_test) +
+                        ")\n            "
+                    ),
+                  ]
+                )
+              }),
+              0
+            )
+          : _c("div", {}, [_vm._v("Вы пока не назначили ни один тест")]),
+        _vm._v(" "),
+        _c(
+          "a",
+          {
+            staticClass: "btn btn-primary",
+            attrs: { href: "/assignment/create" },
+          },
+          [_vm._v("Назначить тестирование\n        ")]
+        ),
+      ]),
       _vm._v(" "),
       _c("VueTabulator", {
         attrs: { options: _vm.options },
@@ -58624,9 +58633,9 @@ var render = function () {
                           _vm._v(_vm._s(user.user_lastname)),
                         ]),
                         _vm._v(
-                          " " +
+                          "\n                            " +
                             _vm._s(user.user_firstname) +
-                            "  " +
+                            "\n                            " +
                             _vm._s(user.user_patronymic) +
                             "\n                        "
                         ),
