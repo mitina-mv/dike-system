@@ -27,4 +27,9 @@ class Testlog extends Model
     {
         return $this->belongsTo(Test::class, 'test_id', 'id');
     }
+
+    public function answerlogs()
+    {
+        return $this->hasMany(Answerlog::class, 'testlog_id', 'id');
+    }
 }

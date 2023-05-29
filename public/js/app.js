@@ -9130,7 +9130,7 @@ __webpack_require__.r(__webpack_exports__);
           field: "test_name",
           sorter: "string",
           headerFilter: true,
-          headerFilterPlaceholder: "Поиск по вопросу"
+          headerFilterPlaceholder: "Поиск по названию"
         }, {
           title: "Дата / время тестирования",
           field: "format-date",
@@ -9159,12 +9159,25 @@ __webpack_require__.r(__webpack_exports__);
           },
           hozAlign: "center",
           headerSort: false,
-          width: 180,
+          width: 150,
           cellClick: function cellClick(e, cell) {
             var data = cell.getRow().getData();
-            _this.deleteAssignment(data);
+            axios["delete"]("".concat(_this.url, "/").concat(data.test_id, "/").concat(data.testlog_date)).then(function (res) {
+              _this.$notify({
+                title: "Удаление назначения",
+                text: "Успех!",
+                type: "success"
+              });
+              cell.getRow()["delete"]();
+            })["catch"](function (error) {
+              _this.$notify({
+                title: "Удаление назначения",
+                text: "Не удалось обработать запрос",
+                type: "error"
+              });
+            });
           }
-        }, {}],
+        }],
         layout: "fitColumns",
         height: "auto"
       }
@@ -9182,14 +9195,17 @@ __webpack_require__.r(__webpack_exports__);
       axios.get("/assignment/" + this.curYear).then(function (response) {
         _this2.testList = response.data;
       })["catch"](function (error) {
-        console.log(error);
+        _this2.$notify({
+          title: "Получение списка тестов",
+          text: error.response.data.message,
+          type: "error"
+        });
       });
     },
     getUserList: function getUserList(data) {
       var _this3 = this;
       axios.get("".concat(this.url, "/").concat(data.test_id, "/").concat(data.testlog_date)).then(function (res) {
         _this3.usersList = res.data;
-        _this3.visibleModalUsers = true;
         _this3.$modal.show("my-first-modal");
       })["catch"](function (error) {
         _this3.$notify({

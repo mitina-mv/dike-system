@@ -77,7 +77,7 @@ export default {
                         field: "test_name",
                         sorter: "string",
                         headerFilter: true,
-                        headerFilterPlaceholder: "Поиск по вопросу",
+                        headerFilterPlaceholder: "Поиск по названию",
                     },
                     {
                         title: "Дата / время тестирования",
@@ -119,14 +119,29 @@ export default {
                         },
                         hozAlign: "center",
                         headerSort: false,
-                        width: 180,
+                        width: 150,
                         cellClick: (e, cell) => {
                             let data = cell.getRow().getData();
 
-                            this.deleteAssignment(data);
+                            axios
+                                .delete(`${this.url}/${data.test_id}/${data.testlog_date}`)
+                                .then((res) => {
+                                    this.$notify({
+                                        title: "Удаление назначения",
+                                        text: "Успех!",
+                                        type: "success",
+                                    });
+                                    cell.getRow().delete();
+                                })
+                                .catch((error) => {
+                                    this.$notify({
+                                        title: "Удаление назначения",
+                                        text: "Не удалось обработать запрос",
+                                        type: "error",
+                                    });
+                                });
                         },
                     },
-                    {},
                 ],
                 layout: "fitColumns",
                 height: "auto",
@@ -147,8 +162,12 @@ export default {
                 .then((response) => {
                     this.testList = response.data;
                 })
-                .catch(function (error) {
-                    console.log(error);
+                .catch((error) => {
+                    this.$notify({
+                        title: "Получение списка тестов",
+                        text: error.response.data.message,
+                        type: "error",
+                    });
                 });
         },
         getUserList(data) {
@@ -156,7 +175,6 @@ export default {
                 .get(`${this.url}/${data.test_id}/${data.testlog_date}`)
                 .then((res) => {
                     this.usersList = res.data;
-                    this.visibleModalUsers = true;
                     this.$modal.show("my-first-modal");
                 })
                 .catch((error) => {
@@ -172,7 +190,7 @@ export default {
         },
         deleteAssignment(data)
         {
-
+            
         }
     },
 };

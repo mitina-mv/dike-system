@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Testlog;
 use DateTime;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -50,6 +51,14 @@ class AssignmentController extends Controller
         )
         ->get();
 
+        if(empty($tmpTestLogs->all()))
+        {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Ошибка при получении списка тестов. Для этого года тестов нет'
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
         // чтобы вывести группы студентов, которым назначен тест
         $usersIdTestLogs = Testlog::where([
             'teacher_id' => Auth::user()->id,
@@ -75,6 +84,7 @@ class AssignmentController extends Controller
             $testLogs[$userlog->test_id . "_" . $userlog->testlog_date]['groups'][] = $userlog->studgroup_name;
         }
 
+        $arResult = [];
         foreach($testLogs as &$testLog)
         {
             $testLog['groups'] = implode(
@@ -131,8 +141,38 @@ class AssignmentController extends Controller
     {
         # code...
     }
-    public function destroy($id)
+
+
+    public function destroyAll($test_id, $date)
     {
-        # code...
+        try {
+            // удаляем все привязки
+            DB::transaction(function() use ($test_id, $date) {
+                $testLogs = Testlog::where([
+                    'teacher_id' => Auth::user()->id,
+                    'test_id' => $test_id,
+                    'testlog_date' => $date
+                ])->get()->all();
+
+                foreach($testLogs as $tl)
+                {
+                    $answerLogs = $tl->answerlogs()->get()->all();
+                    foreach($answerLogs as $al)
+                    {
+                        $al->delete();
+                    }
+                    $tl->delete();
+                }
+            });
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'У меня не получается удалить этот тест'
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        return response()->json([
+            'message' => 'Удаление успешно!'
+        ], Response::HTTP_OK);
     }
 }
