@@ -8,14 +8,23 @@ use Illuminate\Database\Eloquent\Model;
 class Testlog extends Model
 {
     use HasFactory;
+
+    protected $fillable = [
+        'testlog_date',
+        'testlog_mark',
+        'testlog_time',
+        'user_id',
+        'test_id',
+        'teacher_id',
+    ];
     
     public function user()
     {
-        return $this->hasOne(User::class);
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
     public function test()
     {
-        return $this->hasOne(Test::class);
+        return $this->belongsTo(Test::class, 'test_id', 'id');
     }
 }

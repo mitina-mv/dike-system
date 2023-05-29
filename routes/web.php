@@ -96,6 +96,8 @@ Route::group(['middleware' => ['auth']], function() {
     Route::group(['prefix' => 'assignment'], function() {
         // все, что когда либо назначали
         Route::get('/', [AssignmentController::class, 'index'])->name('assignment.index');
+        Route::get('/{year}', [AssignmentController::class, 'list']);
+        Route::get('/{test_id}/{date}', [AssignmentController::class, 'read']);
         
         // форма назначения - отдать всех пользователей по группам
         Route::get('/create', [AssignmentController::class, 'formCreate'])->name('assignment.formCreate');
