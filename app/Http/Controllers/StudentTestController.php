@@ -278,6 +278,10 @@ class StudentTestController extends Controller
                 {
                     // ответ пользователя
                     $getAnswer = isset($request->answers[$alog->question_id]) ? $request->answers[$alog->question_id] : null;
+                    
+                    // увеличиваем сумму всех ответов
+                    $fullSumCorrectAnswer += $alog->question->mark;
+                    
                     // если ничего не пришло - фиксируем 0 оценку за ответ
                     if(!$getAnswer)
                     {
@@ -288,9 +292,6 @@ class StudentTestController extends Controller
                     // если ответ есть
                     // узнаем тип вопроса
                     $typeQuestion = json_decode($alog->question->question_settings, false)->type;
-
-                    // увеличиваем сумму всех ответов
-                    $fullSumCorrectAnswer += $alog->question->mark;
 
                     // решаем как оценивать
                     switch($typeQuestion) {

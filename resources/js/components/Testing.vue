@@ -62,10 +62,14 @@ export default {
                 '/testing/' + this.testlogid,
                 {answers: sender.data}
             )
-                .then(function (response) {
-                    console.log(response);
+                .then((response) => {
+                    this.$notify({
+                        title: 'Сохранение результатов тестирования',
+                        text: "Сохранено успешно!</br> Ваш результат: " + response.data.mark,
+                        type: 'success',
+                    });
                 })
-                .catch(function (error) {
+                .catch((error) => {
                     this.$notify({
                         title: 'Сохранение результатов тестирования',
                         text: error.response.data.message ? error.response.data.message : "Не удалось обработать запрос",
