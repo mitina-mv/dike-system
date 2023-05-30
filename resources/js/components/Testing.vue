@@ -1,6 +1,8 @@
 <template>
-    <span>
-        <div v-if="!survey.isCompleted" class="navigation-block">
+    <div>
+        <survey :survey="survey" />
+        
+        <div v-if="!survey.isCompleted" class="navigation-block d-flex">
             <div>
                 <span class="navigation-text">{{progressText()}}</span>
                 <button v-if="!survey.isFirstPage"
@@ -25,13 +27,12 @@
                         @change="changeCurrentPage($event)">
                     <option v-for="(item, index) in survey.visiblePages"
                             :key="index" :value="index">
-                        {{"Страница " + (index + 1)}}
+                        {{"Вопрос " + (index + 1)}}
                     </option>
                 </select>
             </div>
         </div>
-        <survey :survey="survey" />
-    </span>
+    </div>
 </template>
 
 <script>
@@ -41,84 +42,27 @@ import { Survey } from "survey-vue-ui";
 
 StylesManager.applyTheme("defaultV2");
 
-const surveyJson = { 
-    title: "Software developer survey.",
-    pages: [
-      {
-        "title": "What operating system do you use?",
-        "elements": [
-          {
-            "type": "checkbox",
-            "name": "opSystem",
-            "title": "OS",
-            "showOtherItem": true,
-            "isRequired": true,
-            "choices": [ "Windows", "Linux", "Macintosh OSX" ]
-          }
-        ]
-      },
-      {
-        "title": "What language(s) are you currently using?",
-        "elements": [
-          {
-            "type": "checkbox",
-            "name": "langs",
-            "title": "Please select from the list",
-            "colCount": 4,
-            "isRequired": true,
-            "choices": [
-              "Javascript",
-              "Java",
-              "Python",
-              "CSS",
-              "PHP",
-              "Ruby",
-              "C++",
-              "C",
-              "Shell",
-              "C#",
-              "Objective-C",
-              "R",
-              "VimL",
-              "Go",
-              "Perl",
-            ]
-          }
-        ]
-      },
-      {
-        "title": "Please enter your name and e-mail",
-        "elements": [
-          {
-            "type": "text",
-            "name": "name",
-            "title": "Name:"
-          },
-          {
-            "type": "text",
-            "name": "email",
-            "title": "Your e-mail"
-          }
-        ]
-      }],
-    pageNextText: "Далее",
-    pagePrevText: "Назад",
-    previewText: "Проверка",
-    completeText: "Завершить тестирование",
-    completedHtml: "<h3>Тестирование завершено! Оценка отобразится на странице тестов.</h3>",
-    showPreviewBeforeComplete: "showAnsweredQuestions"
-};
-
 export default {
+    props: ['testing'],
     components: {
         Survey,
     },
     data() {
-        const survey = new Model(surveyJson);
+        const survey = new Model(Object.assign(this.testing, {
+            pageNextText: "Далее",
+            pagePrevText: "Назад",
+            previewText: "Проверка",
+            completeText: "Завершить тестирование",
+            completedHtml: "<h3>Тестирование завершено! Оценка отобразится на странице тестов.</h3> <a href='/student-test' class='sd-btn sd-btn--action'>Страница тестов</a>",
+            showPreviewBeforeComplete: "showAnsweredQuestions",
+        }));
+
         survey.onComplete.add((sender, options) => {
             console.log(JSON.stringify(sender.data, null, 3));
         });
+
         return {
+            surveyConfig: null,
             survey: survey,
             changeCurrentPage: (event) => {
                 survey.currentPageNo = Number(event.target.value);
@@ -127,6 +71,13 @@ export default {
                 return "Вопрос " + (survey.currentPageNo + 1) + " из " + survey.visiblePages.length;
             }
         };
+    },
+    mounted() {
+        this.surveyConfig = {
+            title: this.testing.title,
+            pages: this.testing.pages,
+            pageNextText: "Далее"
+        }
     },
     methods: {
         alertResults(sender) {
@@ -170,5 +121,9 @@ export default {
 }
 .navigation-page-selector:focus {
     outline: 1px solid #1ab394;
+}
+.navigation-block.d-flex {
+    align-items: center;
+    justify-content: space-around;
 }
 </style>

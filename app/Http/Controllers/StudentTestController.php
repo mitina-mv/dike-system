@@ -2,12 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Answer;
+use App\Models\Answerlog;
 use App\Models\Discipline;
 use App\Models\Testlog;
 use DateInterval;
 use DateTime;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
 
 class StudentTestController extends Controller
@@ -78,13 +82,15 @@ class StudentTestController extends Controller
             $dateTest = new DateTime($tl['testlog_date']);
             $tl['format-date'] = $dateTest->format('Y-m-d H:i');
 
-            $now = new DateTime();
-            $intervalDateTime = $now->add(new DateInterval('PT30M'));
-
-            if($dateTest <= $intervalDateTime && !$tl['testlog_mark'])
+            $start_ts = strtotime($tl['testlog_date']);
+            $end_ts = $start_ts + 1800;
+            
+            $now = time();
+            
+            if(($now >= $start_ts) && ($now <= $end_ts) && !$tl['testlog_mark'])
             {
                 $tl['active_test'] = true; 
-            } else if($now < $dateTest || $now > $intervalDateTime) {
+            } else if($now < $start_ts) {
                 $tl['active_test'] = -1; 
             }
             else {
@@ -112,7 +118,124 @@ class StudentTestController extends Controller
 
     public function testing($testlog_id)
     {
-        $title = 'Test';
-        return view('testing.index', compact('title'));
+        $structureTest = [];
+        try {
+            $structureTest = DB::transaction(function() use ($testlog_id) {
+                $testlog = Testlog::where([
+                    'testlogs.id' => $testlog_id,
+                    'testlogs.user_id' => Auth::user()->id
+                ])
+                ->select(
+                    'tests.test_name',
+                    'testlog_date',
+                    'testlogs.id'
+                )
+                ->join('tests', 'tests.id', '=', 'testlogs.test_id')
+                ->first();
+        
+                // проверка существования тестирвования
+                if(empty($testlog))
+                {
+                    throw new Exception("Это тестирование не для Вас!", 1);
+                }
+
+                // проверка что время не прошло
+                $start_ts = strtotime($testlog->testlog_date);
+                $end_ts = $start_ts + 1800;
+                
+                $now = time();
+                if(($now < $start_ts) || ($now > $end_ts))
+                {
+                    throw new Exception("Тестирование недоступно по времени", 1);
+                }
+        
+                // получаем вопросы
+                $questions = Answerlog::where([
+                    'testlog_id' => $testlog->id
+                ])
+                ->select(
+                    'answerlogs.id AS answerlog_id',
+                    'question_text',
+                    'question_settings',
+                    'question_id',
+                )
+                ->join('questions', 'questions.id', '=', 'answerlogs.question_id')
+                ->orderBy('answerlog_id')
+                ->get()->all();
+        
+                $structureTest = [
+                    'title' => $testlog->test_name,
+                    'pages' => []
+                ];
+                // dump($anwsers);
+                // получаем все ответы
+                foreach($questions as $q)
+                {
+                    // определяем тип вопроса
+                    $typeQuestion = json_decode($q->question_settings, false)->type;
+
+                    switch($typeQuestion){
+                        case 'multiple':
+                            $surveyType = 'checkbox';
+                            break;
+                        case 'text':
+                            $surveyType = 'text';
+                            break;
+                        case 'single':
+                        default:
+                            $surveyType = 'radiogroup';
+                            break;
+                    };
+                    
+                    // забираем ответы
+                    $anwsers = [];
+                    if($surveyType != 'text')
+                    {
+                        $anwsers = Answer::where([
+                            ["question_id", '=', $q->question_id]
+                        ])->get()->all();
+                    }
+
+                    // генерируем страницу вопроса
+                    $page = [
+                        'title' => $q->question_text,
+                        'elements' => [[
+                            'name' => (string) $q->question_id,
+                            "isRequired" => true,
+                            'type' => $surveyType,
+                            'title' => $surveyType == 'text' ? 'Ваш ответ:' : 'Выберите ответ:'
+                        ]]
+                    ];
+
+                    if($surveyType == 'checkbox' || $surveyType == 'radiogroup')
+                    {
+                        // dd($anwsers);
+                        foreach($anwsers as $ans)
+                        {
+                            $page['elements'][0]['choices'][] = [
+                                'value' => $ans->id,
+                                'text' => $ans->answer_name
+                            ];
+                            $page['elements'][0]['choicesOrder'] = 'random';
+                        }
+                    }
+                     
+                    $structureTest['pages'][] = $page;
+                }
+
+                return $structureTest;
+            });
+        } catch (Exception $e) {
+            if($e->getCode() == 1)
+            {
+                $error = $e->getMessage();
+            } else {
+                $error = 'В ходе составления теста были допущены непоправимые ошибки. Повторите запрос позднее.';
+            }
+
+            return view('testing.index', compact('error'));
+        }
+
+        return view('testing.index', compact('structureTest'));
     }
 }
