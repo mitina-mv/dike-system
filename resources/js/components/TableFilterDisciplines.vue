@@ -112,6 +112,11 @@ export default {
             this.columns.push({
                 formatter: (cell) => {
                     let data = cell.getRow().getData();
+                    if(data.active_test == -1)
+                    {
+                        return `<span class='text-danger'>Недоступно</span>`
+                    }
+
                     if(data.active_test)
                         return `<a
                             href="${this.url}/${data.id}"
@@ -129,7 +134,6 @@ export default {
                 },
                 hozAlign:"center",
                 headerSort:false,
-                width: 150
             });
         }
     },

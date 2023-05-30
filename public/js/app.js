@@ -8929,11 +8929,13 @@ __webpack_require__.r(__webpack_exports__);
       this.columns.push({
         formatter: function formatter(cell) {
           var data = cell.getRow().getData();
+          if (data.active_test == -1) {
+            return "<span class='text-danger'>\u041D\u0435\u0434\u043E\u0441\u0442\u0443\u043F\u043D\u043E</span>";
+          }
           if (data.active_test) return "<a\n                            href=\"".concat(_this.url, "/").concat(data.id, "\"\n                            class=\"btn btn-outline-success\"\n                        >\n                            \u041F\u0440\u043E\u0439\u0442\u0438 \u0442\u0435\u0441\u0442\u0438\u0440\u043E\u0432\u0430\u043D\u0438\u0435\n                        </a>");else if (data.get_report) return "<a\n                                href=\"/student-test/".concat(data.id, "\"\n                                class=\"btn btn-outline-success\"\n                            >\n                                \u041E\u0442\u0447\u0435\u0442\n                            </a>");
         },
         hozAlign: "center",
-        headerSort: false,
-        width: 150
+        headerSort: false
       });
     }
   },

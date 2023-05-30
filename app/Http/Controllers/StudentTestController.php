@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Discipline;
 use App\Models\Testlog;
+use DateInterval;
 use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -36,6 +37,7 @@ class StudentTestController extends Controller
             'title' => 'Затраченое время',
             'field' => 'testlog_time',
             'headerFilter' => false,
+            'width' => '150'
         ],
         [
             'title' => 'Оценка',
@@ -76,8 +78,20 @@ class StudentTestController extends Controller
             $dateTest = new DateTime($tl['testlog_date']);
             $tl['format-date'] = $dateTest->format('Y-m-d H:i');
 
-            $tl['active_test'] = (new DateTime()) > $dateTest ? false : true;
-            $tl['get_report'] = (new DateTime()) > $dateTest ? true : false;
+            $now = new DateTime();
+            $intervalDateTime = $now->add(new DateInterval('PT30M'));
+
+            if($dateTest <= $intervalDateTime && !$tl['testlog_mark'])
+            {
+                $tl['active_test'] = true; 
+            } else if($now < $dateTest) {
+                $tl['active_test'] = -1; 
+            }
+            else {
+                $tl['active_test'] = false; 
+            }
+        
+            $tl['get_report'] = $tl['active_test'] ? false : true;
 
             $tests[$tl->discipline_id][] = $tl;
         }
