@@ -62,7 +62,7 @@ class ReportController extends Controller
         $mpdf = new Mpdf();
         $mpdf->WriteHTML($html);
 
-        $filename = $data['test']->test_name . " " . $data['student']->studgroup->studgroup_name . " " . $data['student']->user_lastname . " " . uniqid();
+        $filename = $data['testlog']->testlog_date . " " . $data['test']->test_name . " " . $data['student']->studgroup->studgroup_name . " " . $data['student']->user_lastname . " " . uniqid();
         $mpdf->Output( Str::slug($filename, '-').".pdf", 'D');
     }
 }

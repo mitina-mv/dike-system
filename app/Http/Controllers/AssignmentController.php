@@ -118,6 +118,7 @@ class AssignmentController extends Controller
             'users.user_patronymic',
             'studgroups.studgroup_name',
             'users.studgroup_id',
+            'testlogs.id as testlog_id'
         ) 
         ->join('users', 'users.id', '=', 'testlogs.user_id')
         ->join('studgroups', 'users.studgroup_id', '=', 'studgroups.id')

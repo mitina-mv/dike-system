@@ -133,6 +133,8 @@ Route::group(['middleware' => ['auth']], function() {
     Route::group(['prefix' => 'reports'], function() {
         // детальный отчет по тестированию
         Route::get('/testlog/{testlog_id}', [ReportController::class, 'studentDetailReport'])->name('report.student');
+        // отчет по группам
+        Route::get('/studgroups/{test_id}/{date}', [ReportController::class, 'studgroupsTestReport'])->name('report.studgroups');
 
         // создание pdf
         Route::get('/generate/testlog/{testlog_id}', [ReportController::class, 'generate_testlog'])->name('report.generate_testlog');

@@ -45,11 +45,17 @@
                                 v-for="(user, ind) in item.users"
                                 :key="ind"
                             >
-                                <b class="user-lastname">{{
-                                    user.user_lastname
-                                }}</b>
-                                {{ user.user_firstname }}
-                                {{ user.user_patronymic }}
+                                <div>
+                                    <b class="user-lastname">{{user.user_lastname }}</b>
+                                    {{ user.user_firstname }}
+                                    {{ user.user_patronymic }}
+                                </div>
+
+                                <a 
+                                    :href="`/reports/testlog/${user.testlog_id}`" 
+                                    target="_blank" rel="noopener noreferrer">
+                                    Детально
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -123,7 +129,7 @@ export default {
                         },
                         hozAlign: "center",
                         headerSort: false,
-                        width: 150,
+                        width: 100,
                         cellClick: (e, cell) => {
                             let data = cell.getRow().getData();
 
@@ -147,6 +153,22 @@ export default {
                                     });
                                 });
                         },
+                    },
+                    {
+                        formatter: (cell) => {
+                            let data = cell.getRow().getData();
+                            return `
+                            <a 
+                                href='/reports/studgroups/${data.test_id}/${data.testlog_date}'
+                                class="btn btn-outline-success"
+                                target="_blank"
+                            >
+                                Результаты
+                            </a>`;
+                        },
+                        hozAlign: "center",
+                        headerSort: false,
+                        width: 120,
                     },
                 ],
                 layout: "fitColumns",
@@ -225,6 +247,9 @@ export default {
     padding: 6px;
     counter-increment: css-counter 1;
     padding-left: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .group__user-list {
