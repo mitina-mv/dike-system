@@ -15,26 +15,26 @@
         <h3>Результаты тестирования: {{ $test->test_name }}</h3>
 
         @if ($web)
-            <a href="<?= route('report.generate_testlog', $testlog->id) ?>" target="_blank"
-                rel="noopener noreferrer" class='btn btn-primary'>
+            <a href="<?= route('report.generate_testlog', $testlog->id) ?>" target="_blank" rel="noopener noreferrer"
+                class='btn btn-primary'>
                 сохранить в PDF
             </a>
         @endif
 
         <div style="margin-bottom: 15px;">
-            <div>
+            <div style="margin-bottom: 6px;">
                 <b>Студент: </b>{{ $student->user_lastname }} {{ $student->user_firstname }}
                 {{ $student->user_patronymic }}
             </div>
-            <div>
+            <div style="margin-bottom: 6px;">
                 <b>Группа: </b>{{ $student->studgroup->studgroup_name }}
             </div>
-            <div>
+            <div style="margin-bottom: 6px;">
                 <b>Дата тестирования: </b> <?= (new DateTime($testlog->testlog_date))->format('Y-m-d H:m') ?>
             </div>
-            <div>
+            <div style="margin-bottom: 6px;">
                 <b>Оценка за тест:
-                </b><?= isset($testlog->testlog_mark) ? "{$testlog->testlog_mark} из 100" : 'не сдано' ?>
+                </b><?= isset($testlog->testlog_mark) ? "{$testlog->testlog_mark} из 100" : '<b style="color: red;">не сдано</b>' ?>
             </div>
 
         </div>
@@ -89,6 +89,7 @@
                             @endswitch
                         </td>
                         <td>
+                        {{-- вывод правильных ответов --}}
                             @switch($type)
                                 @case('text')
                                     @php
@@ -121,47 +122,52 @@
                                 @endswitch
                             </td>
                             <td
-                                @if ($answerlog->answerlog_mark == 0) style='background-color: #ffbebe;'
-                        @elseif ($answerlog->answerlog_mark < $answerlog->question->mark)
-                            style='background-color: #fff3be;'
-                        @else
-                            style='background-color: #bfffbe;' @endif>
-                                <b>{{ $answerlog->answerlog_mark }}</b> </td>
+                                @if ($answerlog->answerlog_mark == 0) 
+                                    style='background-color: #ffbebe;'
+                                @elseif ($answerlog->answerlog_mark < $answerlog->question->mark)
+                                    style='background-color: #fff3be;'
+                                @else
+                                    style='background-color: #bfffbe;' 
+                                @endif
+                            >
+                                <b>{{ $answerlog->answerlog_mark }}</b>
+                            </td>
                         </tr>
                     @endforeach
                 </table>
             @endif
+        <table>
+</body>
 
-        </body>
+<style>
+    body {
+        font-family: Arial, Helvetica, sans-serif;
+    }
 
-        <style>
-            body {
-                font-family: Arial, Helvetica, sans-serif;
-            }
+    /* внешние границы таблицы серого цвета толщиной 1px */
+    table {
+        border: 1px solid grey;
+        border-collapse: collapse;
+        width: 100%;
+    }
 
-            /* внешние границы таблицы серого цвета толщиной 1px */
-            table {
-                border: 1px solid grey;
-                border-collapse: collapse;
-                width: 100%;
-            }
+    /* границы ячеек тела таблицы */
+    th,
+    td {
+        border: 1px solid grey;
+        padding: 8px;
+    }
 
-            /* границы ячеек тела таблицы */
-            th,
-            td {
-                border: 1px solid grey;
-                padding: 8px;
-            }
-            a.btn.btn-primary {
-                display: block;
-                position: absolute;
-                padding: 10px 16px;
-                background: #2c7dff;
-                text-decoration: none;
-                top: 0;
-                right: 0;
-                color: #fff;
-            }
-        </style>
+    a.btn.btn-primary {
+        display: block;
+        position: absolute;
+        padding: 10px 16px;
+        background: #2c7dff;
+        text-decoration: none;
+        top: 0;
+        right: 0;
+        color: #fff;
+    }
+</style>
 
-        </html>
+</html>

@@ -52,6 +52,12 @@ class ReportController extends Controller
         return view('reports.student', $data);
     }
 
+    // страница результаты групп
+    public function studgroupsTestReport($test_id, $date)
+    {
+        # code...
+    }
+
     // функция генерации pdf
     public function generate_testlog($testlog_id)
     {
