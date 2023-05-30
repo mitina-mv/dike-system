@@ -18,6 +18,10 @@ class Testlog extends Model
         'teacher_id',
         'uncorrect_answers',
     ];
+
+    protected $casts = [
+        'uncorrect_answers' => 'array',
+    ];
     
     public function user()
     {

@@ -8,6 +8,7 @@ use App\Http\Controllers\UsersController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\DisciplineController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\StudentTestController;
 use App\Http\Controllers\TestController;
 use App\Models\Role;
@@ -118,20 +119,23 @@ Route::group(['middleware' => ['auth']], function() {
     Route::group(['prefix' => 'student-test'], function() {
         // все назначения (фильтра по дисциплинам)
         Route::get('/', [StudentTestController::class, 'index'])->name('studenttest.index');
-
-        // получить результат - формирование отчета
-        Route::get('/getReport/{testlog_id}', [StudentTestController::class, 'getReport']);
     });
 
     //само тестирование студента
     Route::group(['prefix' => 'testing'], function() {
-        // /{answerlog_id} - для получения вопроса
         // получение плана теста
         Route::get('/{testlog_id}', [StudentTestController::class, 'testing'])->name('testing.index');
+        // фиксирование результата
         Route::post('/{testlog_id}', [StudentTestController::class, 'writeResult']);
+    });
 
-        // // получить результат - формирование отчета
-        // Route::get('/{testlog_id}', [StudentTestController::class, 'getReport']);
+    // отчеты
+    Route::group(['prefix' => 'reports'], function() {
+        // детальный отчет по тестированию
+        Route::get('/testlog/{testlog_id}', [ReportController::class, 'studentDetailReport'])->name('report.student');
+
+        // создание pdf
+        Route::get('/generate/testlog/{testlog_id}', [ReportController::class, 'generate_testlog'])->name('report.generate_testlog');
     });
 });
 // 
