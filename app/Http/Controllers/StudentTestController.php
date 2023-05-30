@@ -253,24 +253,26 @@ class StudentTestController extends Controller
         // dd(array_keys($request->answers));
         try {
             $mark = DB::transaction(function() use ($testlog_id, $request) {
+                $testlog = Testlog::where([
+                    ['id', '=', $testlog_id],
+                    ['user_id', '=', Auth::user()->id]
+                ])->first();
+
                 // проверка существования тестирования
-                if (!Testlog::where([
-                        ['id', '=', $testlog_id],
-                        ['user_id', '=', Auth::user()->id]
-                    ])->exists()
-                ) {
+                if (!$testlog)
+                {
                     throw new Exception("Ошибка в определении назначенного тестирования. Тест, который Вы пытаетесь сохранить, назначен не на Вас.", 1);
                 }
 
                 // полный перечень вопросов теста
-                $answerlogs = Answerlog::where(['testlog_id' => $testlog_id])
+                $answerlogs = Answerlog::where(['testlog_id' => $testlog->id])
                     ->with('question')
                     ->with('question.correct_answers')
                     ->get()->all();
 
                 // dd($answerlogs);
-                $countCorrectAnswers = 0;
-                $fullCountCorrectAnswers = 0;
+                $sumCorrectAnswer = 0;
+                $fullSumCorrectAnswer = 0;
 
                 foreach($answerlogs as $alog)
                 {
@@ -287,6 +289,9 @@ class StudentTestController extends Controller
                     // узнаем тип вопроса
                     $typeQuestion = json_decode($alog->question->question_settings, false)->type;
 
+                    // увеличиваем сумму всех ответов
+                    $fullSumCorrectAnswer += $alog->question->mark;
+
                     // решаем как оценивать
                     switch($typeQuestion) {
                         case 'multiple': {
@@ -294,12 +299,34 @@ class StudentTestController extends Controller
                             $correctAnswers = $alog->question->correct_answers;
                             $correctIds = array_column($correctAnswers->toArray(), 'id');
 
-                            $fullCountCorrectAnswers += count($correctIds);
-
-                            foreach($getAnswer as $gans)
+                            $localCorrectCount = 0;
+                            
+                            foreach($getAnswer as $getid)
                             {
-                                
+                                // правильный ответ
+                                if($pos = (array_search($getid, $correctIds)) !== false)
+                                {
+                                    ++$localCorrectCount;
+                                    $answer = $correctAnswers->all()[$pos];
+
+                                    $answer->answerlogs()->attach(
+                                        $alog->id,
+                                        ['key' => "{$answer->id}_{$alog->id}"]
+                                    );
+                                } else {
+                                    // получаем неправильный ответ
+                                    $answer = Answer::where('id', (int) $getid)->first();
+                                    $answer->answerlogs()->attach(
+                                        $alog->id,
+                                        ['key' => "{$answer->id}_{$alog->id}"]
+                                    );
+                                }
                             }
+                            // считаем оценку за ответ
+                            $answerLogMark = (1 / count($correctIds)) * $alog->question->mark;
+                            $sumCorrectAnswer += $answerLogMark;
+
+                            $alog->update(['answerlog_mark' => $answerLogMark]);
 
                             break;
                         }
@@ -309,13 +336,13 @@ class StudentTestController extends Controller
                                 'mb_strtolower', 
                                 array_column($correctAnswers->toArray(), 'answer_name')
                             );
-                            ++$fullCountCorrectAnswers;
 
                             // если текстовый ответ есть
                             // если правильный
                             if($pos = (array_search(mb_strtolower($getAnswer), $correctText)) !== false)
                             {
-                                ++$countCorrectAnswers;
+                                $sumCorrectAnswer += $alog->question->mark;
+
                                 $answer = $correctAnswers->all()[$pos];
 
                                 $answer->answerlogs()->attach(
@@ -325,28 +352,45 @@ class StudentTestController extends Controller
                                 $alog->update(['answerlog_mark' => $alog->question->mark]);
                             } else {
                                 // добавить поле невернных текстовых ответов в testlog_id
+
+                                $alog->update(['answerlog_mark' => 0]);
                             }
                             break;
                         }
                         case 'single': {
+                            $correctAnswer = $alog->question->correct_answers->all()[0];
+
+                            if($correctAnswer->id == (int) $getAnswer)
+                            {
+                                $correctAnswer->answerlogs()->attach(
+                                    $alog->id,
+                                    ['key' => "{$correctAnswer->id}_{$alog->id}"]
+                                );
+                                $sumCorrectAnswer += $alog->question->mark;
+
+                                $alog->update(['answerlog_mark' => $alog->question->mark]);
+                            } else {
+                                // получаем неправильный ответ
+                                $answer = Answer::where('id', (int) $getAnswer)->first();
+                                $answer->answerlogs()->attach(
+                                    $alog->id,
+                                    ['key' => "{$answer->id}_{$alog->id}"]
+                                );
+                                $alog->update(['answerlog_mark' => 0]);
+                            }
 
                             break;
                         }
                     }
                 }
-                // $answerlosg = $answerlosgModel->get()->all();
-                // dd($answerlosg);
-                // $questions = Question::whereIn(
-                //     'id', 
-                //     $answerlosgModel->select('question_id')->pluck('question_id')
-                // )
-                // ->with('answers')
-                // ->get()->all();
-                // dd($questions);
-                
-                // if(!$questions) {
-                //     throw new Exception("Вопросы определены неверно", 1);
-                // }
+
+                $testlogMark = round(($sumCorrectAnswer / $fullSumCorrectAnswer) * 100, 3);
+
+                $testlog->update([
+                    'testlog_mark' => $testlogMark
+                ]);
+
+                return $testlogMark;
             });
         } catch (Exception $e) {
             if($e->getCode() == 1)
@@ -363,7 +407,7 @@ class StudentTestController extends Controller
         }
 
         return response()->json([
-            'mark' => $mark . "из 100",
+            'mark' => $mark . " из 100",
         ], Response::HTTP_OK);
     }
 }
