@@ -84,7 +84,7 @@ class StudentTestController extends Controller
             if($dateTest <= $intervalDateTime && !$tl['testlog_mark'])
             {
                 $tl['active_test'] = true; 
-            } else if($now < $dateTest) {
+            } else if($now < $dateTest || $now > $intervalDateTime) {
                 $tl['active_test'] = -1; 
             }
             else {
@@ -108,5 +108,11 @@ class StudentTestController extends Controller
     public function getReport($testlog_id)
     {
         # code...
+    }
+
+    public function testing($testlog_id)
+    {
+        $title = 'Test';
+        return view('testing.index', compact('title'));
     }
 }

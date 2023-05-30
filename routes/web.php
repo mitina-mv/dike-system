@@ -126,8 +126,8 @@ Route::group(['middleware' => ['auth']], function() {
     //само тестирование студента
     Route::group(['prefix' => 'testing'], function() {
         // /{answerlog_id} - для получения вопроса
-        // все назначения (фильтра по дисциплинам)
-        // Route::get('/', [StudentTestController::class, 'index'])->name('studenttest.index');
+        // получение плана теста
+        Route::get('/{testlog_id}', [StudentTestController::class, 'testing'])->name('testing.index');
 
         // // получить результат - формирование отчета
         // Route::get('/{testlog_id}', [StudentTestController::class, 'getReport']);

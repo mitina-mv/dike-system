@@ -67,6 +67,9 @@ Vue.component('assignment-table', AssignmentTable)
 import AssignmentForm from './components/assignment/Form.vue'
 Vue.component('assignment-form', AssignmentForm)
 
+import Testing from './components/Testing.vue'
+Vue.component('testing', Testing)
+
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
