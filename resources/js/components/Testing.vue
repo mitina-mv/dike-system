@@ -43,7 +43,7 @@ import { Survey } from "survey-vue-ui";
 StylesManager.applyTheme("defaultV2");
 
 export default {
-    props: ['testing'],
+    props: ['testing', 'testlogid'],
     components: {
         Survey,
     },
@@ -53,11 +53,25 @@ export default {
             pagePrevText: "Назад",
             previewText: "Проверка",
             completeText: "Завершить тестирование",
-            completedHtml: "<h3>Тестирование завершено! Оценка отобразится на странице тестов.</h3> <a href='/student-test' class='sd-btn sd-btn--action'>Страница тестов</a>",
+            completedHtml: "<h3>Тестирование завершено! Оценка отобразится на странице тестов.</h3> <a href='/student-test' class='sd-btn sd-btn--action finalButton'>Страница тестов</a>",
             showPreviewBeforeComplete: "showAnsweredQuestions",
         }));
 
         survey.onComplete.add((sender, options) => {
+            axios.post(
+                '/testing/' + this.testlogid,
+                {answers: sender.data}
+            )
+                .then(function (response) {
+                    console.log(response);
+                })
+                .catch(function (error) {
+                    this.$notify({
+                        title: 'Сохранение результатов тестирования',
+                        text: error.response.data.message ? error.response.data.message : "Не удалось обработать запрос",
+                        type: 'error',
+                    });
+                });
             console.log(JSON.stringify(sender.data, null, 3));
         });
 
@@ -87,7 +101,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
 .navigation-block {
     margin: 10px;
 }
@@ -125,5 +139,9 @@ export default {
 .navigation-block.d-flex {
     align-items: center;
     justify-content: space-around;
+}
+.finalButton {
+    width: fit-content !important;
+    margin: 36px auto !important;
 }
 </style>

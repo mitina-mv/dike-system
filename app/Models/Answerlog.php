@@ -11,17 +11,13 @@ class Answerlog extends Model
 
     protected $fillable = [
         'question_id',
-        'testlog_id'
+        'testlog_id',
+        'answerlog_mark'
     ];
-
-    public function answers()
-    {
-        return $this->belongsToMany(Answer::class);
-    }
     
     public function question()
     {
-        return $this->hasOne(Question::class);
+        return $this->hasOne(Question::class, 'id', 'question_id');
     } 
 
     public function testlog()

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Answer;
 use App\Models\Answerlog;
 use App\Models\Discipline;
+use App\Models\Question;
 use App\Models\Testlog;
 use DateInterval;
 use DateTime;
@@ -128,7 +129,8 @@ class StudentTestController extends Controller
                 ->select(
                     'tests.test_name',
                     'testlog_date',
-                    'testlogs.id'
+                    'testlogs.id',
+                    'testlogs.testlog_mark'
                 )
                 ->join('tests', 'tests.id', '=', 'testlogs.test_id')
                 ->first();
@@ -137,6 +139,11 @@ class StudentTestController extends Controller
                 if(empty($testlog))
                 {
                     throw new Exception("Это тестирование не для Вас!", 1);
+                }
+                // проверка на отсуствие оценки
+                if($testlog['testlog_mark'])
+                {
+                    throw new Exception("Вы уже прошли данное тестирование", 1);
                 }
 
                 // проверка что время не прошло
@@ -236,6 +243,127 @@ class StudentTestController extends Controller
             return view('testing.index', compact('error'));
         }
 
-        return view('testing.index', compact('structureTest'));
+        return view('testing.index', compact('structureTest', 'testlog_id'));
+    }
+
+    
+
+    public function writeResult(Request $request, $testlog_id)
+    {
+        // dd(array_keys($request->answers));
+        try {
+            $mark = DB::transaction(function() use ($testlog_id, $request) {
+                // проверка существования тестирования
+                if (!Testlog::where([
+                        ['id', '=', $testlog_id],
+                        ['user_id', '=', Auth::user()->id]
+                    ])->exists()
+                ) {
+                    throw new Exception("Ошибка в определении назначенного тестирования. Тест, который Вы пытаетесь сохранить, назначен не на Вас.", 1);
+                }
+
+                // полный перечень вопросов теста
+                $answerlogs = Answerlog::where(['testlog_id' => $testlog_id])
+                    ->with('question')
+                    ->with('question.correct_answers')
+                    ->get()->all();
+
+                // dd($answerlogs);
+                $countCorrectAnswers = 0;
+                $fullCountCorrectAnswers = 0;
+
+                foreach($answerlogs as $alog)
+                {
+                    // ответ пользователя
+                    $getAnswer = isset($request->answers[$alog->question_id]) ? $request->answers[$alog->question_id] : null;
+                    // если ничего не пришло - фиксируем 0 оценку за ответ
+                    if(!$getAnswer)
+                    {
+                        $alog->update(['answerlog_mark' => 0]);
+                        continue;
+                    }
+
+                    // если ответ есть
+                    // узнаем тип вопроса
+                    $typeQuestion = json_decode($alog->question->question_settings, false)->type;
+
+                    // решаем как оценивать
+                    switch($typeQuestion) {
+                        case 'multiple': {
+                            // получаем все правильные ответы
+                            $correctAnswers = $alog->question->correct_answers;
+                            $correctIds = array_column($correctAnswers->toArray(), 'id');
+
+                            $fullCountCorrectAnswers += count($correctIds);
+
+                            foreach($getAnswer as $gans)
+                            {
+                                
+                            }
+
+                            break;
+                        }
+                        case 'text': {
+                            $correctAnswers = $alog->question->correct_answers;
+                            $correctText = array_map(
+                                'mb_strtolower', 
+                                array_column($correctAnswers->toArray(), 'answer_name')
+                            );
+                            ++$fullCountCorrectAnswers;
+
+                            // если текстовый ответ есть
+                            // если правильный
+                            if($pos = (array_search(mb_strtolower($getAnswer), $correctText)) !== false)
+                            {
+                                ++$countCorrectAnswers;
+                                $answer = $correctAnswers->all()[$pos];
+
+                                $answer->answerlogs()->attach(
+                                    $alog->id,
+                                    ['key' => "{$answer->id}_{$alog->id}"]
+                                );
+                                $alog->update(['answerlog_mark' => $alog->question->mark]);
+                            } else {
+                                // добавить поле невернных текстовых ответов в testlog_id
+                            }
+                            break;
+                        }
+                        case 'single': {
+
+                            break;
+                        }
+                    }
+                }
+                // $answerlosg = $answerlosgModel->get()->all();
+                // dd($answerlosg);
+                // $questions = Question::whereIn(
+                //     'id', 
+                //     $answerlosgModel->select('question_id')->pluck('question_id')
+                // )
+                // ->with('answers')
+                // ->get()->all();
+                // dd($questions);
+                
+                // if(!$questions) {
+                //     throw new Exception("Вопросы определены неверно", 1);
+                // }
+            });
+        } catch (Exception $e) {
+            if($e->getCode() == 1)
+            {
+                $error = $e->getMessage();
+            } else {
+                $error = 'В процессе сохранения ответов возникла ошибка';
+            }
+            return response()->json([
+                'status' => 'error',
+                // 'message' => $error
+                'message' => $e->getMessage()
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        return response()->json([
+            'mark' => $mark . "из 100",
+        ], Response::HTTP_OK);
     }
 }

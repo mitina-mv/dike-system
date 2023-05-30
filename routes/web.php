@@ -128,6 +128,7 @@ Route::group(['middleware' => ['auth']], function() {
         // /{answerlog_id} - для получения вопроса
         // получение плана теста
         Route::get('/{testlog_id}', [StudentTestController::class, 'testing'])->name('testing.index');
+        Route::post('/{testlog_id}', [StudentTestController::class, 'writeResult']);
 
         // // получить результат - формирование отчета
         // Route::get('/{testlog_id}', [StudentTestController::class, 'getReport']);

@@ -20,11 +20,11 @@ class Answer extends Model
 
     public function answerlogs()
     {
-        return $this->belongsToMany(Answerlog::class);
+        return $this->belongsToMany(Answerlog::class, 'answer_answerlog');
     }
 
     public function question()
     {
-        return $this->hasOne(Question::class);
+        return $this->belongsTo(Question::class, 'question_id', 'id');
     } 
 }
