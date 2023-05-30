@@ -250,7 +250,6 @@ class StudentTestController extends Controller
 
     public function writeResult(Request $request, $testlog_id)
     {
-        // dd(array_keys($request->answers));
         try {
             $mark = DB::transaction(function() use ($testlog_id, $request) {
                 $testlog = Testlog::where([
@@ -270,9 +269,9 @@ class StudentTestController extends Controller
                     ->with('question.correct_answers')
                     ->get()->all();
 
-                // dd($answerlogs);
                 $sumCorrectAnswer = 0;
                 $fullSumCorrectAnswer = 0;
+                $uncorrectTextAnswers = [];
 
                 foreach($answerlogs as $alog)
                 {
@@ -281,7 +280,7 @@ class StudentTestController extends Controller
                     
                     // увеличиваем сумму всех ответов
                     $fullSumCorrectAnswer += $alog->question->mark;
-                    
+
                     // если ничего не пришло - фиксируем 0 оценку за ответ
                     if(!$getAnswer)
                     {
@@ -353,7 +352,7 @@ class StudentTestController extends Controller
                                 $alog->update(['answerlog_mark' => $alog->question->mark]);
                             } else {
                                 // добавить поле невернных текстовых ответов в testlog_id
-
+                                $uncorrectTextAnswers[$alog->question->id] = $getAnswer;
                                 $alog->update(['answerlog_mark' => 0]);
                             }
                             break;
@@ -388,7 +387,8 @@ class StudentTestController extends Controller
                 $testlogMark = round(($sumCorrectAnswer / $fullSumCorrectAnswer) * 100, 3);
 
                 $testlog->update([
-                    'testlog_mark' => $testlogMark
+                    'testlog_mark' => $testlogMark,
+                    'uncorrect_answers' => json_encode($uncorrectTextAnswers)
                 ]);
 
                 return $testlogMark;

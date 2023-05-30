@@ -76,7 +76,6 @@ export default {
                         type: 'error',
                     });
                 });
-            console.log(JSON.stringify(sender.data, null, 3));
         });
 
         return {
