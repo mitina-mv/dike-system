@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View;
 use Mpdf\Mpdf;
 use Mpdf\Output\Destination;
+use Illuminate\Support\Str;
+
 
 // use Illuminate\View\View;
 
@@ -39,7 +41,9 @@ class ReportController extends Controller
         ->with('question.correct_answers')
         ->get()->all();
 
-        return compact('questions', 'testlog', 'test', 'student');
+        $web = request()->route()->getName() == 'report.student';
+
+        return compact('questions', 'testlog', 'test', 'student', 'web');
     }
     // данные для генерации страницы
     public function studentDetailReport($testlog_id)
@@ -57,7 +61,8 @@ class ReportController extends Controller
         
         $mpdf = new Mpdf();
         $mpdf->WriteHTML($html);
-        $mpdf->Output();
 
+        $filename = $data['test']->test_name . " " . $data['student']->studgroup->studgroup_name . " " . $data['student']->user_lastname . " " . uniqid();
+        $mpdf->Output( Str::slug($filename, '-').".pdf", 'D');
     }
 }
