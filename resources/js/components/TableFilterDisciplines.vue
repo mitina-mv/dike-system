@@ -15,9 +15,9 @@
                 {{ disc.discipline_name }}
             </button>
 
-            <a href="/discipline/" class="btn btn-primary">+ Добавить дисциплину</a>
+            <a href="/discipline/" class="btn btn-primary" v-if="!hidebuttons">+ Добавить дисциплину</a>
         </div>
-        <a :href="url + '/create'" class="btn btn-success">+ Создать</a>
+        <a :href="url + '/create'" class="btn btn-success" v-if="!hidebuttons">+ Создать</a>
 
         <VueTabulator v-model="tabledata[currentDiscipline]" :options="options" />
     </div>
@@ -25,7 +25,26 @@
 
 <script>
 export default {
-    props: ['discipline', 'tabledata', 'url', 'columns', 'addactions'],
+    props: {
+        discipline: {
+            required: false,
+        },
+        tabledata: {
+            required: false,
+        },
+        url: {
+            required: false,
+        },
+        columns: {
+            required: false,
+        },
+        addactions: {
+            required: false,
+        },
+        hideaddedbuttons: {
+            required: false,
+        },
+    },
     data() {
         return {
             // TODO фу кака
@@ -34,11 +53,12 @@ export default {
                 columns: this.columns,
                 layout:"fitColumns",
                 height:"auto",
-            }
+            },
+            hidebuttons: this.hideaddedbuttons ? true : false
         }
     },
     mounted(){
-        if(this.addactions)
+        if(this.addactions && this.addactions != 'report')
         {
             this.columns.push({
                 formatter: (cell) => {
@@ -87,6 +107,33 @@ export default {
                             });
                         })
                 }
+            });
+        } else if(this.addactions == 'report') {
+            this.columns.push({
+                formatter: (cell) => {
+                    let data = cell.getRow().getData();
+                    if(data.active_test == -1)
+                    {
+                        return `<span class='text-danger'>Недоступно</span>`
+                    }
+
+                    if(data.active_test)
+                        return `<a
+                            href="${this.url}/${data.id}"
+                            class="btn btn-outline-success"
+                        >
+                            Пройти тестирование
+                        </a>`
+                    else if(data.get_report)
+                        return `<a
+                                href="/student-test/${data.id}"
+                                class="btn btn-outline-success"
+                            >
+                                Отчет
+                            </a>`
+                },
+                hozAlign:"center",
+                headerSort:false,
             });
         }
     },

@@ -160,7 +160,7 @@ class AssignmentController extends Controller
         if(empty($tmpstudgroups) || empty($tests))
         {
             $error = 'У вас пока нет тестов или не привязаны группы. Создайте шаблоны тестов. Если проблема не решается, обратитесь к администратору от организации.';
-            return view('assignment.form', compact('studgroups', 'tests'));
+            return view('assignment.form', compact('error'));
         }
 
         $studgroups = [];

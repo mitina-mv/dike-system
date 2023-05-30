@@ -40,5 +40,10 @@ class Question extends Model
     public function answers()
     {
         return $this->hasMany(Answer::class, 'question_id');
+    }
+
+    public function correct_answers()
+    {
+        return $this->hasMany(Answer::class, 'question_id')->where('answer_status', true);
     } 
 }

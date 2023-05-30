@@ -16,6 +16,7 @@ class Testlog extends Model
         'user_id',
         'test_id',
         'teacher_id',
+        'uncorrect_answers',
     ];
     
     public function user()
