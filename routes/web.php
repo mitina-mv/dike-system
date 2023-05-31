@@ -43,7 +43,7 @@ Route::group(['prefix' => 'org'], function() {
 // 
 Route::group(['middleware' => ['auth']], function() {
     // add student groups
-    Route::group(['prefix' => 'group'], function() {
+    Route::group(['prefix' => 'group', 'middleware' => ['role.admin']], function() {
         Route::get('create', [StudgroupController::class, 'index'])->name('group.create');
         Route::post('create', [StudgroupController::class, 'create']);
     });
@@ -55,7 +55,7 @@ Route::group(['middleware' => ['auth']], function() {
     });
     
     // add user by roles
-    Route::group(['prefix' => 'users'], function() {
+    Route::group(['prefix' => 'users', 'middleware' => ['role.admin']], function() {
         Route::get('/', [UsersController::class, 'index'])->name('users.index');
 
         Route::get('teacher', [UsersController::class, 'createTeacher'])->name('users.createTeacher');
@@ -69,7 +69,7 @@ Route::group(['middleware' => ['auth']], function() {
     });
 
     // question CRUD
-    Route::group(['prefix' => 'question'], function() {
+    Route::group(['prefix' => 'question', 'middleware' => ['role.no.student']], function() {
         Route::get('/', [QuestionController::class, 'index'])->name('question.index');
         Route::get('/create', [QuestionController::class, 'formCreate'])->name('question.formCreate');
         Route::post('/create', [QuestionController::class, 'create'])->name('question.create');
@@ -79,13 +79,13 @@ Route::group(['middleware' => ['auth']], function() {
     });
 
     // discipline CRUD
-    Route::group(['prefix' => 'discipline'], function() {
+    Route::group(['prefix' => 'discipline', 'middleware' => ['role.no.student']], function() {
         Route::get('/', [DisciplineController::class, 'index'])->name('discipline.index');
         Route::post('/', [DisciplineController::class, 'create'])->name('discipline.create');
     });
 
     // test CRUD
-    Route::group(['prefix' => 'test'], function() {
+    Route::group(['prefix' => 'test', 'middleware' => ['role.teacher']], function() {
         Route::get('/', [TestController::class, 'index'])->name('tests.index');
 
         Route::get('/create', [TestController::class, 'formCreate'])->name('tests.formCreate');
@@ -97,7 +97,7 @@ Route::group(['middleware' => ['auth']], function() {
     });
 
     // назначение тестирований
-    Route::group(['prefix' => 'assignment'], function() {
+    Route::group(['prefix' => 'assignment', 'middleware' => ['role.teacher']], function() {
         // все, что когда либо назначали
         Route::get('/', [AssignmentController::class, 'index'])->name('assignment.index');
         Route::get('/{year}', [AssignmentController::class, 'list'])->where('year', '[0-9]+');
@@ -116,13 +116,13 @@ Route::group(['middleware' => ['auth']], function() {
     });
 
     // список тестирований
-    Route::group(['prefix' => 'student-test'], function() {
+    Route::group(['prefix' => 'student-test', 'middleware' => ['role.student']], function() {
         // все назначения (фильтра по дисциплинам)
         Route::get('/', [StudentTestController::class, 'index'])->name('studenttest.index');
     });
 
     //само тестирование студента
-    Route::group(['prefix' => 'testing'], function() {
+    Route::group(['prefix' => 'testing', 'middleware' => ['role.student']], function() {
         // получение плана теста
         Route::get('/{testlog_id}', [StudentTestController::class, 'testing'])->name('testing.index');
         // фиксирование результата
