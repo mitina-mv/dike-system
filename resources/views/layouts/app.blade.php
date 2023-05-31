@@ -34,6 +34,29 @@
             <main>
                 {{ $slot }}
             </main>
+
+            
+            <footer class="d-flex">
+                <div class="yeat__footer">@<?= date("Y");?>  Митина Мария</div>
+                <div class="name__footer">Курсовой проект "АСУТ Дике"</div>
+            </footer>
+
+            <style>
+                footer.d-flex {
+                    justify-content: space-around;
+                    padding: 10px;
+                }
+
+                .min-h-screen.bg-gray-100 {
+                    display: flex;
+                    flex-direction: column;
+                }
+
+                main {
+                    flex: 1 0 auto;
+                }
+            </style>
         </div>
+
     </body>
 </html>
