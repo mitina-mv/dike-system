@@ -138,6 +138,7 @@ Route::group(['middleware' => ['auth']], function() {
 
         // создание pdf
         Route::get('/generate/testlog/{testlog_id}', [ReportController::class, 'generate_testlog'])->name('report.generate_testlog');
+        Route::get('/generate/studgroups/{test_id}/{date}', [ReportController::class, 'generate_studgroups'])->name('report.generate_studgroups');
     });
 });
 // 

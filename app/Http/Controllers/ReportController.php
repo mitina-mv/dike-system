@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Answerlog;
+use App\Models\Discipline;
 use App\Models\Role;
 use App\Models\Test;
 use App\Models\Testlog;
@@ -70,6 +71,7 @@ class ReportController extends Controller
         }
 
         $test = Test::find($test_id);
+        $discipline = Discipline::find($test->discipline_id);
 
         $studgroups = [];
         foreach($testlogs as $tl)
@@ -93,7 +95,7 @@ class ReportController extends Controller
      
         $web = request()->route()->getName() == 'report.studgroups';
 
-        return compact('studgroups', 'test', 'date', 'web');
+        return compact('studgroups', 'test', 'date', 'web', 'discipline');
     }
     // страница результаты групп
     public function studgroupsTestReport($test_id, $date)
@@ -113,6 +115,20 @@ class ReportController extends Controller
         $mpdf->WriteHTML($html);
 
         $filename = $data['testlog']->testlog_date . " " . $data['test']->test_name . " " . $data['student']->studgroup->studgroup_name . " " . $data['student']->user_lastname . " " . uniqid();
+        $mpdf->Output( Str::slug($filename, '-').".pdf", 'D');
+    }
+
+    // функция генерации pdf
+    public function generate_studgroups($test_id, $date)
+    {
+        $data = self::getDataStudgroupsTestReport($test_id, $date);
+
+        $html = View::make('reports.studgroups', $data)->render();
+        
+        $mpdf = new Mpdf();
+        $mpdf->WriteHTML($html);
+
+        $filename = $data['date'] . " " . $data['test']->test_name . uniqid();
         $mpdf->Output( Str::slug($filename, '-').".pdf", 'D');
     }
 }
