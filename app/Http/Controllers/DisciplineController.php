@@ -22,10 +22,15 @@ class DisciplineController extends Controller
                 'discipline_name' => $request->name,
                 'code' => $request->code
             ]);
-            return redirect()->route('question.index');
         } catch (Exception $e) {
-            $error = $e->getMessage();
-            return view('discipline.index', compact('error'));
+            return response()->json([
+                'status' => 'error',
+                'message' => "Не удалось создать дисциплину. Возможно, она уже существует."
+            ], Response::HTTP_BAD_REQUEST);
         }
+
+        return response()->json([
+            'message' => "Сохранение выполнено успешно"
+        ], Response::HTTP_CREATED);
     }
 }

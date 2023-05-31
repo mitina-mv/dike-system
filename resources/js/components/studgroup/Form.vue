@@ -4,7 +4,7 @@
             <FormulateInput
                 name="name"
                 validation="required|max:255, length"
-                label="Название группы"
+                :label="label"
                 help="Не более 255 символов"
             />
             <FormulateInput 
@@ -19,6 +19,7 @@
 
 <script>
 export default {
+    props: ['label', 'url'],
     data() {
         return {
             formData: {},
@@ -29,19 +30,24 @@ export default {
     {
         send()
         {
-            axios.post("/group/create", this.formData)
+            axios.post(this.url, this.formData)
                 .then((res) => 
                 {
                     this.$notify({
-                        title: 'Создание группы',
+                        title: 'Создание',
                         text: res.data.message ? res.data.message : "Успешно!",
                         type: "success",
                     });
                 })
                 .catch((error) => {
+                    let errorMessage = error.response.data.message;
+
+                    if(error.response.data.errors && error.response.data.errors.code)
+                        errorMessage = error.response.data.errors.code[0];
+
                     this.$notify({
-                        title: "Создание группы",
-                        text: error.response.data.message,
+                        title: "Создание",
+                        text: errorMessage,
                         type: "error",
                     });
                 });

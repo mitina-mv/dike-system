@@ -13,7 +13,10 @@
                     <?= $error?>
                 @else
                     <div id="app">
-                        <studgroup-form></studgroup-form>
+                        <studgroup-form
+                            label='Название группы студентов'
+                            url="/group/create"
+                        ></studgroup-form>
                         <notifications/>
                     </div>
                 @endif
