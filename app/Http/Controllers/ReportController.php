@@ -52,10 +52,54 @@ class ReportController extends Controller
         return view('reports.student', $data);
     }
 
+    public static function getDataStudgroupsTestReport($test_id, $date)
+    {
+        // данные о назначении
+        $testlogs = Testlog::where([
+            'teacher_id' => Auth::user()->id,
+            'test_id' => $test_id,
+            'testlog_date' => $date
+        ])
+        ->get()->all();
+
+        if(Auth::user()->role_id !== Role::ROLE_TEACHER
+            || empty($testlogs)
+        ) {
+            $error = 'Вы не имеете достаточных прав на это действие';
+            return compact('error');
+        }
+
+        $test = Test::find($test_id);
+
+        $studgroups = [];
+        foreach($testlogs as $tl)
+        {
+            $student = $tl->user()->first();
+
+            if(!isset($studgroups[$student->studgroup_id])) {
+                $studgroup = $student->studgroup()->select('id', 'studgroup_name')->first();
+
+                $studgroups[$studgroup->id] = [
+                    'name' => $studgroup->studgroup_name,
+                    'users' => []
+                ];
+            }
+
+            $item['full_name'] = "{$student->user_lastname} {$student->user_firstname} {$student->user_patronymic}";
+            $item['mark'] = $tl->testlog_mark;
+
+            $studgroups[$student->studgroup_id]['users'][] = $item;
+        }
+     
+        $web = request()->route()->getName() == 'report.studgroups';
+
+        return compact('studgroups', 'test', 'date', 'web');
+    }
     // страница результаты групп
     public function studgroupsTestReport($test_id, $date)
     {
-        # code...
+        $data = self::getDataStudgroupsTestReport($test_id, $date);
+        return view('reports.studgroups', $data);
     }
 
     // функция генерации pdf
