@@ -37,6 +37,7 @@ class QuestionCreateRequest extends FormRequest
                 'integer', 
                 ValidationRule::in(Discipline::select('id')->pluck('id'))
             ],
+            'id' => [],
             'mark' => ['required', 'numeric', 'min:1'],
             'type' => ['required', 'string', 'in:single,multiple,text'],
             'answers' => ['required', 'array']

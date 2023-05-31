@@ -8,14 +8,11 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                {{-- <form action="{{ route('users.store_student') }}" method="post">
-                    @csrf --}}
-                    <div id="app">
-                        <student-form :groups='@json($studgroups)'></student-form>
+                <div id="app">
+                    <student-form :groups='@json($studgroups)'></student-form>
 
-                        <notifications/>
-                    </div>
-                {{-- </form> --}}
+                    <notifications/>
+                </div>
             </div>
         </div>
     </div>

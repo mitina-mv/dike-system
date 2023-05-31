@@ -76,7 +76,8 @@ class QuestionController extends Controller
         if($this->checkRules())
         {
             $title = 'Добавление вопроса';
-            $discipline = Discipline::orderBy('discipline_name', 'asc')->get()->all();
+            $discipline = Discipline::orderBy('discipline_name', 'asc')
+                ->pluck('discipline_name', 'id');
             
             return view('question.form', compact('title', 'discipline'));
         } else {
@@ -90,7 +91,8 @@ class QuestionController extends Controller
     {
         if($this->checkRules())
         {
-            $discipline = Discipline::orderBy('discipline_name', 'asc')->get()->all();
+            $discipline = Discipline::orderBy('discipline_name', 'asc')
+                ->pluck('discipline_name', 'id');
             $title = 'Редактирование вопроса';
 
             $user = Auth::user();
