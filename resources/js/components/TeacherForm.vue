@@ -1,110 +1,105 @@
 <template>
-    <div>
-        <div v-for="(field, index) in fields" :key="index">
-            <div class="form-group">
-                <label for="">Фамилия</label>
-                <input
-                    type="text"
-                    class="form-control"
-                    placeholder="Фамилия"
-                    :name="'items[' + index + '][lastname]'"
-                    v-model="field.lastname"
-                />
-            </div>
-            
-            <div class="form-group">
-                <label for="">Имя</label>
-                <input
-                    type="text"
-                    class="form-control"
-                    placeholder="Имя"
-                    :name="'items[' + index + '][firstname]'"
-                    v-model="field.firstname"
-                />
-            </div>
-            
-            <div class="form-group">
-                <label for="">Отчество</label>
-                <input
-                    type="text"
-                    class="form-control"
-                    placeholder="Отчество"
-                    :name="'items[' + index + '][patronymic]'"
-                    v-model="field.patronymic"
-                />
-            </div>
-            
-            <div class="form-group">
-                <label for="">Email</label>
-                <input
-                    type="text"
-                    class="form-control"
-                    placeholder="Email"
-                    :name="'items[' + index + '][user_email]'"
-                    v-model="field.user_email"
-                />
-            </div>
+    <div class="form-wrapper formulate-student-group">
+        <FormulateForm v-model="formData" #default="{ hasErrors }">
+            <p>
+                Введите данные преподавателей. Помните, при первом входе в систему им следует использовать в качестве пароль email. Предупредите их, что при первом входе им лучше поменять свой пароль на странице профиля.<br>
+                Также отметим, что администратор не может изменять пароли других пользователей.
+            </p>
 
-            <multiselect
-                v-model="field.group"
-                :options="groups"
-                :multiple="true"
-                :taggable="true"
-                label="studgroup_name"
-                track-by="id"
-                placeholder="Связанные группы"
-                :name="'items[' + index + '][studgroup]'"
-            ></multiselect>
+            <FormulateInput
+                type="group"
+                name="items"
+                :repeatable="true"
+                label="Введите данные преподаателей"
+                add-label="+ Добавить поля"
+                validation="required"
+            >
+                <div class="attendee">
+                    <FormulateInput
+                        name="lastname"
+                        validation="required|max:255,length"
+                        label="Фамилия"
+                    />
+                    <FormulateInput
+                        name="firstname"
+                        validation="required|max:255,length"
+                        label="Имя"
+                    />
+                    <FormulateInput
+                        name="patronymic"
+                        label="Отчество"
+                    />
+                    <FormulateInput
+                        type="email"
+                        name="user_email"
+                        validation="required|email"
+                        label="Email"
+                    />
+                    <FormulateInput
+                        class="groups-block"
+                        type="checkbox"
+                        validation="required|min:1"
+                        name="group"
+                        label="Группы студентов"
+                        :options="groups"
+                    />
+                </div>
+            </FormulateInput>
 
-            <button @click="removeField(index)">Удалить</button>
-        </div>
-        <div @click="addField">Добавить группу полей</div>
-        <button @click="sendData">Сохранить</button>
+            <FormulateInput 
+                type="submit" 
+                :disabled="hasErrors"
+                label="Сохранить"
+                @click="send"
+            />
+        </FormulateForm>
     </div>
 </template>
 
 <script>
-import Multiselect from "vue-multiselect";
-
 export default {
-    props: ["groups"],
-
-    components: { Multiselect },
-
+    props: ['groups'],
     data() {
         return {
-            fields: [
-                { lastname: "", firstname: "", patronymic: "", group: [], user_email: "" },
-            ],
-        };
-    },
-
-    methods: {
-        addField() {
-            this.fields.push({
-                lastname: "",
-                firstname: "",
-                patronymic: "",
-                group: [],
-                user_email: "",
-            });
-        },
-        removeField(index) {
-            this.fields.splice(index, 1);
-        },
-        sendData(event) {
-            event.preventDefault();
-            axios
-                .post("/users/teacher", {items: this.fields})
-                .then(function (response) {
-                    console.log(response);
-                })
-                .catch(function (error) {
-                    console.log(error);
-                });
+            formData: {}
         }
     },
+    methods: 
+    {
+        send()
+        {
+            axios.post('/users/teacher', this.formData)
+            .then((res) => {
+                this.$notify({
+                    title: "Добавление преподавателей",
+                    text: res.data.message ? res.data.message : "Успешно!",
+                    type: "success",
+                });
+            })
+            .catch((error) => {
+                this.$notify({
+                    title: "Добавление преподавателей",
+                    text: error.response.data.message,
+                    type: "error",
+                });
+            });
+        }
+    }
 };
 </script>
 
-<style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
+<style>
+.formulate-student-group .formulate-input-grouping {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    width: 100%;
+}
+
+.formulate-student-group .formulate-input-element.formulate-input-element--group.formulate-input-group {
+    max-width: 100%;
+}
+.groups-block [role=group] {
+    max-height: 150px;
+    overflow-y: auto;
+}
+</style>
