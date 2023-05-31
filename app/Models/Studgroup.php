@@ -8,6 +8,12 @@ use Illuminate\Database\Eloquent\Model;
 class Studgroup extends Model
 {
     use HasFactory;
+    
+    protected $fillable = [
+        'studgroup_name',
+        'org_id',
+    ];
+    public $timestamps = false;
 
     public function users()
     {

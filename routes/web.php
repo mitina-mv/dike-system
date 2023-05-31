@@ -10,6 +10,7 @@ use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\DisciplineController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\StudentTestController;
+use App\Http\Controllers\StudgroupController;
 use App\Http\Controllers\TestController;
 use App\Models\Role;
 use Illuminate\Support\Facades\Auth;
@@ -43,9 +44,8 @@ Route::group(['prefix' => 'org'], function() {
 Route::group(['middleware' => ['auth']], function() {
     // add student groups
     Route::group(['prefix' => 'group'], function() {
-        Route::get('create', function(){
-            return 'ddd';
-        })->name('group.create');
+        Route::get('create', [StudgroupController::class, 'index'])->name('group.create');
+        Route::post('create', [StudgroupController::class, 'create']);
     });
 
     // profile
