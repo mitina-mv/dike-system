@@ -92,7 +92,7 @@ class UsersController extends Controller
             ->where([
                 'org_id' => Auth::user()->org_id
             ])
-            ->get();
+            ->pluck('studgroup_name', 'id');
 
         return view('users.create_student', compact('studgroups'));
     }

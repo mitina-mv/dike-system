@@ -2,7 +2,8 @@
 
 <style>
     .logo {
-    width: 125px;
-    height: 50px;
+        width: 130px;
+    height: 62px;
+    object-fit: contain;
 }
 </style>

@@ -1,92 +1,94 @@
 <template>
-    <div>
-        <div
-            v-for="(field, index) in fields"
-            :key="index"
-            class="student-form__item mt-3"
-        >
-            <input
-                v-model="field.surname"
-                placeholder="Фамилия"
-                class="form-control"
-                :name="'items[' + index + '][lastname]'"
-            />
-            <input
-                v-model="field.name"
-                placeholder="Имя"
-                class="form-control"
-                :name="'items[' + index + '][firstname]'"
-            />
-            <input
-                v-model="field.patronymic"
-                placeholder="Отчество"
-                class="form-control"
-                :name="'items[' + index + '][patronymic]'"
-            />
-            <input
-                v-model="field.email"
-                placeholder="Email"
-                class="form-control"
-                :name="'items[' + index + '][user_email]'"
-            />
-
-            <select
-                v-model="field.group"
-                :name="'items[' + index + '][studgroup]'"
-                class="form-control"
+    <div class="form-wrapper formulate-student-group">
+        <FormulateForm v-model="formData" #default="{ hasErrors }">
+            <FormulateInput
+                type="group"
+                name="items"
+                :repeatable="true"
+                label="Введите данные студентов"
+                add-label="+ Добавить поля"
+                validation="required"
             >
-                <option
-                    :value="group.id"
-                    v-for="(group, igroup) in groups"
-                    :key="igroup"
-                >
-                    {{ group.studgroup_name }}
-                </option>
-            </select>
+                <div class="attendee">
+                    <FormulateInput
+                        name="lastname"
+                        validation="required"
+                        label="Фамилия"
+                    />
+                    <FormulateInput
+                        name="firstname"
+                        validation="required"
+                        label="Имя"
+                    />
+                    <FormulateInput
+                        name="patronymic"
+                        label="Отчество"
+                    />
+                    <FormulateInput
+                        type="email"
+                        name="user_email"
+                        validation="required|email"
+                        label="Email"
+                    />
+                    <FormulateInput
+                        type="select"
+                        name="studgroup"
+                        label="Группа студентов"
+                        :options="groups"
+                    />
+                </div>
+            </FormulateInput>
 
-            <button @click="removeField(index)" class="btn btn-danger">
-                Удалить
-            </button>
-        </div>
-        <div @click="addField" class="btn btn-outline-primary mt-3">
-            Добавить группу полей
-        </div>
+            <FormulateInput 
+                type="submit" 
+                :disabled="hasErrors"
+                label="Сохранить"
+                @click="send"
+            />
+        </FormulateForm>
     </div>
 </template>
 
-<script lang="ts">
+<script>
 export default {
-    props: ["groups"],
-
+    props: ['groups'],
     data() {
         return {
-            fields: [
-                { surname: "", name: "", patronymic: "", group: "", email: "" },
-            ],
-        };
+            formData: {}
+        }
     },
-
-    methods: {
-        addField() {
-            this.fields.push({
-                surname: "",
-                name: "",
-                patronymic: "",
-                group: "",
-                email: "",
+    methods: 
+    {
+        send()
+        {
+            axios.post('/users/student', this.formData)
+            .then((res) => {
+                this.$notify({
+                    title: "Добавление студентов",
+                    text: res.data.message ? res.data.message : "Успешно!",
+                    type: "success",
+                });
+            })
+            .catch((error) => {
+                this.$notify({
+                    title: "Добавление студентов",
+                    text: error.response.data.message,
+                    type: "error",
+                });
             });
-        },
-        removeField(index) {
-            this.fields.splice(index, 1);
-        },
-    },
+        }
+    }
 };
 </script>
 
-<style scoped>
-.student-form__item {
+<style>
+.formulate-student-group .formulate-input-grouping {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
-    gap: 10px 20px;
+    width: 100%;
+}
+
+.formulate-student-group .formulate-input-element.formulate-input-element--group.formulate-input-group {
+    max-width: 100%;
 }
 </style>
