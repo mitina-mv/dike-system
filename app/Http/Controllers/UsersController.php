@@ -12,6 +12,8 @@ use App\Models\Role;
 use App\Models\Studgroup;
 use App\Models\User;
 use Exception;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
 
 class UsersController extends Controller
@@ -81,7 +83,8 @@ class UsersController extends Controller
             ->where([
                 'org_id' => Auth::user()->org_id
             ])
-            ->get();
+            ->orderBy('id', 'asc', 'studgroup_name')
+            ->pluck('studgroup_name', 'id');
 
         return view('users.create_teacher', compact('studgroups'));
     }
@@ -92,64 +95,71 @@ class UsersController extends Controller
             ->where([
                 'org_id' => Auth::user()->org_id
             ])
-            ->get();
+            ->pluck('studgroup_name', 'id');
 
         return view('users.create_student', compact('studgroups'));
     }
 
     public function storeTeacher(Request $request)
     {
-        $orgID = Auth::user()->org_id;
-        
-        $request->validate([
-            'items' => 'array|required',
-            'items.*.group' => ['array', 'required'],
-            'items.*.group.*id' => ['integer'],
-            'items.*.lastname' => ['required', 'string', 'max:255'],
-            'items.*.firstname' => ['required', 'string', 'max:255'],
-            'items.*.patronymic' => ['string', 'max:255'],
-            'items.*.user_email' => ['required', 'string', 'email', 'max:255', 'unique:users']
-        ]);
-
         try {
-            foreach($request->items as $item)
-            {
-                $user = User::create([
-                    'user_firstname' => $item['firstname'],
-                    'user_lastname' => $item['lastname'],
-                    'user_patronymic' => $item['patronymic'] ?: null,
-                    'user_email' => $item['user_email'],
-                    'password' => Hash::make($item['user_email']),
-                    'role_id' => 2,
-                    'org_id' => $orgID
+            DB::transaction(function() use ($request) {
+                $orgID = Auth::user()->org_id;
+
+                $request->validate([
+                    'items' => 'array|required',
+                    'items.*.group' => ['array', 'required'],
+                    'items.*.group.*id' => ['integer'],
+                    'items.*.lastname' => ['required', 'string', 'max:255'],
+                    'items.*.firstname' => ['required', 'string', 'max:255'],
+                    'items.*.patronymic' => ['nullable', 'string', 'max:255'],
+                    'items.*.user_email' => ['required', 'string', 'email', 'max:255', 'unique:users']
                 ]);
-    
-                // add relationship studgroup
-                if($item['group']) {
-                    // generate primary keys
-                    $keys = [];
-                    foreach($item['group'] as $group)
-                    {
-                        $keys[]['key'] = $user->id . "_" . $group['id'];
+        
+                foreach($request->items as $item)
+                {
+                    $user = User::create([
+                        'user_firstname' => $item['firstname'],
+                        'user_lastname' => $item['lastname'],
+                        'user_patronymic' => $item['patronymic'] ?: null,
+                        'user_email' => $item['user_email'],
+                        'password' => Hash::make($item['user_email']),
+                        'role_id' => 2,
+                        'org_id' => $orgID
+                    ]);
+        
+                    // add relationship studgroup
+                    if($item['group']) {
+                        // generate primary keys
+                        $keys = [];
+                        foreach($item['group'] as $group)
+                        {
+                            $keys[]['key'] = $user->id . "_" . (int)$group;
+                        }
+                        
+                        // add bind teacher_studgroup
+                        $user->studgroups()->attach(
+                            array_combine(
+                                $item['group'],
+                                $keys
+                            )
+                        );
                     }
-                    
-                    // add bind teacher_studgroup
-                    $user->studgroups()->attach(
-                        array_combine(
-                            array_column($item['group'], 'id'),
-                            $keys
-                        )
-                    );
                 }
-            }
+            });
+        } catch (ValidationException $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => "Ошибки при заполнении полей. В первую очередь проверьте почту - скорее всего она уже занята. Кроме того, как минимум одна группа студентов должна быть выбрана.",
+            ], Response::HTTP_BAD_REQUEST);
+
         } catch (Exception $e) {
             return response()->json([
-                'message' => 'произошла ошибка в ходе добавления пользователей',
                 'status' => 'error',
-                'error' => $e->getMessage()
-            ], 500);
-
+                'message' => $e->getMessage()
+            ], Response::HTTP_BAD_REQUEST);
         }
+
 
         return response()->json([
             'message' => "Сохранение выполнено успешно"
@@ -158,27 +168,37 @@ class UsersController extends Controller
 
     public function storeStudent(Request $request)
     {
-        $request->validate([
-            'items' => 'array|required',
-            'items.*.studgroup' => ['integer', 'required'],
-            'items.*.lastname' => ['required', 'string', 'max:255'],
-            'items.*.firstname' => ['required', 'string', 'max:255'],
-            'items.*.patronymic' => ['string', 'max:255'],
-            'items.*.user_email' => ['required', 'string', 'email', 'max:255', 'unique:users']
-        ]);
+        try {
+            DB::transaction(function() use ($request) {
 
-        foreach($request->items as $item)
-        {
-            User::create([
-                'user_firstname' => $item['firstname'],
-                'user_lastname' => $item['lastname'],
-                'user_patronymic' => $item['patronymic'] ?: null,
-                'user_email' => $item['user_email'],
-                'password' => Hash::make($item['user_email']),
-                'role_id' => 3,
-                'org_id' => Auth::user()->org_id,
-                'studgroup_id' => $item['studgroup']
-            ]);
+                $request->validate([
+                    'items' => 'array|required',
+                    'items.*.studgroup' => ['integer', 'required'],
+                    'items.*.lastname' => ['required', 'string', 'max:255'],
+                    'items.*.firstname' => ['required', 'string', 'max:255'],
+                    'items.*.patronymic' => ['nullable', 'string', 'max:255'],
+                    'items.*.user_email' => ['required', 'string', 'email', 'max:255', 'unique:users']
+                ]);
+
+                foreach($request->items as $item)
+                {
+                    User::create([
+                        'user_firstname' => $item['firstname'],
+                        'user_lastname' => $item['lastname'],
+                        'user_patronymic' => $item['patronymic'] ?: null,
+                        'user_email' => $item['user_email'],
+                        'password' => Hash::make($item['user_email']),
+                        'role_id' => 3,
+                        'org_id' => Auth::user()->org_id,
+                        'studgroup_id' => $item['studgroup']
+                    ]);
+                }
+            });
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ], Response::HTTP_BAD_REQUEST);
         }
 
         return response()->json([

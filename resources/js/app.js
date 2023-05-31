@@ -70,6 +70,9 @@ Vue.component('assignment-form', AssignmentForm)
 import Testing from './components/Testing.vue'
 Vue.component('testing', Testing)
 
+import StudgroupForm from './components/studgroup/Form.vue'
+Vue.component('studgroup-form', StudgroupForm)
+
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to

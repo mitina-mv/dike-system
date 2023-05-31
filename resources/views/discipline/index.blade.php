@@ -7,24 +7,19 @@
     
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                <form method="POST" action="{{ route('discipline.create') }}">
-                    @csrf 
-                    @if (isset($error))
-                        <?= $error?>
-                    @endif
-                    
-                    <!-- org name -->
-                    <div>
-                        <x-label for="discipline_name" :value="__('Название дисциплины')" />
-
-                        <x-input id="discipline_name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus />
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">            
+                @if (isset($error))
+                    <?= $error?>
+                @else
+                    <div id="app">
+                        <studgroup-form
+                            label='Название дисциплины'
+                            url="/discipline"
+                        ></studgroup-form>
+                        <notifications/>
                     </div>
-
-                    <x-button class="ml-4">
-                        {{ __('Добавить') }}
-                    </x-button>
-                </form>
+                @endif
+                
             </div>
         </div>
     </div>
