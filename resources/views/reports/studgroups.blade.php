@@ -18,7 +18,7 @@
                 сохранить в PDF
             </a>
         @endif
-        <h3>Результаты тестирования по тесту: {{ $test->test_name }} за <?= (new DateTime($date))->format('Y-m-d H:m') ?></h3>
+        <h2>Результаты тестирования по тесту: {{ $test->test_name }} за <?= (new DateTime($date))->format('Y-m-d H:m') ?></h2>
 
         <div style='margin-bottom: 16px;'>
             <div style="margin-bottom: 6px;">

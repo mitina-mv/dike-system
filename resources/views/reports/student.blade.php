@@ -12,7 +12,7 @@
     @if (isset($error))
         {{ $error }}
     @else
-        <h3>Результаты тестирования: {{ $test->test_name }}</h3>
+        <h2>Результаты тестирования: {{ $test->test_name }}</h2>
 
         @if ($web)
             <a href="<?= route('report.generate_testlog', $testlog->id) ?>" target="_blank" rel="noopener noreferrer"
@@ -40,16 +40,19 @@
         </div>
 
         <table>
+            <thead>
+                <tr>
+                    <th>Выбранный ответ</th>
+                    <th>Правильный ответ</th>
+                    <th>Стоимость ответа</th>
+                    <th>Оценка</th>
+                </tr>
+            </thead>
             @foreach ($questions as $key => $answerlog)
                 <tr>
-                    <th colspan="3" style="text-align:left; background-color: #ebeced;">
+                    <th colspan="4" style="text-align:left; background-color: #ebeced;">
                         {{ $key + 1 }}. {{ $answerlog->question->question_text }}
                     </th>
-                </tr>
-                <tr>
-                    <td>Выбранный ответ</td>
-                    <td>Правильный ответ</td>
-                    <td>Оценка</td>
                 </tr>
                 <tr>
                     <td>
@@ -60,7 +63,7 @@
                         @switch($type)
                             @case('text')
                                 @if (!empty($answerlog->get_answer->all()))
-                                    {{ $answerlog->get_answer->all()->answer_name }}
+                                    {{ $answerlog->get_answer->all()[0]->answer_name }}
                                 @elseif (isset($testlog->uncorrect_answers) && isset($testlog->uncorrect_answers[$answerlog->question->id]))
                                     {{ $testlog->uncorrect_answers[$answerlog->question->id] }}
                                 @else
@@ -70,22 +73,27 @@
 
                             @case('multiple')
                                 @if (!empty($answerlog->get_answer->all()))
-                                    @foreach ($answerlog->get_answer as $gans)
-                                        {{ $gans->answer_name }},
-                                    @endforeach
+                                    @php
+                                        $ans = [];
+                                        foreach ($answerlog->get_answer as $gans) {
+                                            $ans[] = $gans->answer_name;
+                                        }
+                                        $str = implode(' & ', $ans);
+                                    @endphp
+
+                                    {{ $str }}
                                 @else
                                     <span style="color: red;">Нет ответа</span>
                                 @endif
                             @break
 
                             @case('single')
-
-                                @default
-                                    @if (!empty($answerlog->get_answer->all()))
-                                        {{ $answerlog->get_answer[0]->answer_name }}
-                                    @else
-                                        <span style="color: red;">Нет ответа</span>
-                                    @endif
+                            @default
+                                @if (!empty($answerlog->get_answer->all()))
+                                    {{ $answerlog->get_answer[0]->answer_name }}
+                                @else
+                                    <span style="color: red;">Нет ответа</span>
+                                @endif
                             @endswitch
                         </td>
                         <td>
@@ -120,6 +128,9 @@
                                     @default
                                         {{ $answerlog->question->correct_answers[0]->answer_name }}
                                 @endswitch
+                            </td>
+                            <td>
+                                {{ $answerlog->question->mark }}
                             </td>
                             <td
                                 @if ($answerlog->answerlog_mark == 0) 

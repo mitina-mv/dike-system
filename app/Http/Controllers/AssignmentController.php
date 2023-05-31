@@ -215,8 +215,9 @@ class AssignmentController extends Controller
                     ->limit($countQuestion)
                     ->get()->all();
         
-                    if(($count = count($questions)) !== $countQuestion)
+                    if(count($questions) != $countQuestion)
                     {
+                        $count = count($questions);
                         throw new Exception("Подготовьте банк вопросов на эту тему. На текущий момент требуется {$countQuestion} из них найдено {$count}");
                     }
         
