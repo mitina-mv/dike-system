@@ -154,7 +154,6 @@ class UsersController extends Controller
             ], Response::HTTP_BAD_REQUEST);
 
         } catch (Exception $e) {
-            dd($e);
             return response()->json([
                 'status' => 'error',
                 'message' => $e->getMessage()
