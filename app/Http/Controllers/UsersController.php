@@ -100,14 +100,14 @@ class UsersController extends Controller
     public function storeTeacher(Request $request)
     {
         $orgID = Auth::user()->org_id;
-        
+
         $request->validate([
             'items' => 'array|required',
             'items.*.group' => ['array', 'required'],
             'items.*.group.*id' => ['integer'],
             'items.*.lastname' => ['required', 'string', 'max:255'],
             'items.*.firstname' => ['required', 'string', 'max:255'],
-            'items.*.patronymic' => ['string', 'max:255'],
+            'items.*.patronymic' => ['nullable', 'string', 'max:255'],
             'items.*.user_email' => ['required', 'string', 'email', 'max:255', 'unique:users']
         ]);
 
@@ -158,12 +158,13 @@ class UsersController extends Controller
 
     public function storeStudent(Request $request)
     {
+
         $request->validate([
             'items' => 'array|required',
             'items.*.studgroup' => ['integer', 'required'],
             'items.*.lastname' => ['required', 'string', 'max:255'],
             'items.*.firstname' => ['required', 'string', 'max:255'],
-            'items.*.patronymic' => ['string', 'max:255'],
+            'items.*.patronymic' => ['nullable', 'string', 'max:255'],
             'items.*.user_email' => ['required', 'string', 'email', 'max:255', 'unique:users']
         ]);
 
