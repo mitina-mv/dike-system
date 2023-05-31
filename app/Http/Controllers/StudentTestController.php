@@ -275,6 +275,8 @@ class StudentTestController extends Controller
 
                 foreach($answerlogs as $alog)
                 {
+                    // dump($alog);
+                    
                     // ответ пользователя
                     $getAnswer = isset($request->answers[$alog->question_id]) ? $request->answers[$alog->question_id] : null;
                     
@@ -303,8 +305,9 @@ class StudentTestController extends Controller
                             
                             foreach($getAnswer as $getid)
                             {
+                                $pos = array_search($getid, $correctIds);
                                 // правильный ответ
-                                if($pos = (array_search($getid, $correctIds)) !== false)
+                                if($pos !== false)
                                 {
                                     ++$localCorrectCount;
                                     $answer = $correctAnswers->all()[$pos];
@@ -316,6 +319,7 @@ class StudentTestController extends Controller
                                 } else {
                                     // получаем неправильный ответ
                                     $answer = Answer::where('id', (int) $getid)->first();
+
                                     $answer->answerlogs()->attach(
                                         $alog->id,
                                         ['key' => "{$answer->id}_{$alog->id}"]
@@ -323,7 +327,7 @@ class StudentTestController extends Controller
                                 }
                             }
                             // считаем оценку за ответ
-                            $answerLogMark = (1 / count($correctIds)) * $alog->question->mark;
+                            $answerLogMark = round(((1 / count($correctIds)) * $localCorrectCount * $alog->question->mark), 3);
                             $sumCorrectAnswer += $answerLogMark;
 
                             $alog->update(['answerlog_mark' => $answerLogMark]);
@@ -339,7 +343,7 @@ class StudentTestController extends Controller
 
                             // если текстовый ответ есть
                             // если правильный
-                            if($pos = (array_search(mb_strtolower($getAnswer), $correctText)) !== false)
+                            if(($pos = (array_search(mb_strtolower($getAnswer), $correctText))) !== false)
                             {
                                 $sumCorrectAnswer += $alog->question->mark;
 

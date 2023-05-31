@@ -126,7 +126,8 @@ export default {
                         </a>`
                     else if(data.get_report)
                         return `<a
-                                href="/student-test/${data.id}"
+                                href="/reports/testlog/${data.id}"
+                                target="_blank"
                                 class="btn btn-outline-success"
                             >
                                 Отчет

@@ -118,6 +118,7 @@ class AssignmentController extends Controller
             'users.user_patronymic',
             'studgroups.studgroup_name',
             'users.studgroup_id',
+            'testlogs.id as testlog_id'
         ) 
         ->join('users', 'users.id', '=', 'testlogs.user_id')
         ->join('studgroups', 'users.studgroup_id', '=', 'studgroups.id')
@@ -214,8 +215,9 @@ class AssignmentController extends Controller
                     ->limit($countQuestion)
                     ->get()->all();
         
-                    if(($count = count($questions)) !== $countQuestion)
+                    if(count($questions) != $countQuestion)
                     {
+                        $count = count($questions);
                         throw new Exception("Подготовьте банк вопросов на эту тему. На текущий момент требуется {$countQuestion} из них найдено {$count}");
                     }
         

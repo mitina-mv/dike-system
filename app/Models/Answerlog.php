@@ -24,4 +24,9 @@ class Answerlog extends Model
     {
         return $this->hasOne(Testlog::class);
     } 
+
+    public function get_answer()
+    {
+        return $this->belongsToMany(Answer::class, 'answer_answerlog');
+    } 
 }
