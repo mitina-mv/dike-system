@@ -202,8 +202,8 @@ export default {
 
             for (let i = 0; i < this.formData.answers.length; i++) 
             {
-                if (this.formData.answers[i].isCorrect == true
-                && (this.formData.answers[i].isDelete == false 
+                if (this.formData.answers[i].isCorrect === true
+                && (this.formData.answers[i].isDelete === false 
                     || this.formData.answers[i].isDelete == "")
                 ) {
                     correctAnswers++;
@@ -216,9 +216,7 @@ export default {
 
             for (let i = 0; i < this.formData.answers.length; i++) 
             {
-                if (this.formData.answers[i].isDelete == false 
-                    || this.formData.answers[i].isDelete == ""
-                ) {
+                if (this.formData.answers[i].isDelete === true) {
                     correctAnswers++;
                 }
             }
@@ -234,8 +232,10 @@ export default {
                     
                     break;
                 case 'text':
-                    let bool = this.countCorrectAnswers() === (this.formData.answers.length - this.countDeleteAnswers());
-                    return bool;
+                    let correctAnswers = this.countCorrectAnswers();
+                    let bool = correctAnswers === (this.formData.answers.length - this.countDeleteAnswers());
+
+                    return bool && correctAnswers != 0;
                     break;
             
                 default:

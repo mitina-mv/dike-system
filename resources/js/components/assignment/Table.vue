@@ -177,7 +177,7 @@ export default {
         };
     },
     mounted() {
-        if (this.years) {
+        if (this.yearstart) {
             this.getTestList(this.curYear);
         }
     },
