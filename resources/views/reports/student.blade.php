@@ -48,6 +48,10 @@
                     <th>Оценка</th>
                 </tr>
             </thead>
+            @php
+                $uncorrect = json_decode($testlog->uncorrect_answers, true);
+            @endphp
+
             @foreach ($questions as $key => $answerlog)
                 <tr>
                     <th colspan="4" style="text-align:left; background-color: #ebeced;">
@@ -59,13 +63,16 @@
                         @php
                             $type = json_decode($answerlog->question->question_settings, false)->type;
                         @endphp
+
                         {{-- вывод ответа студента --}}
                         @switch($type)
                             @case('text')
                                 @if (!empty($answerlog->get_answer->all()))
                                     {{ $answerlog->get_answer->all()[0]->answer_name }}
-                                @elseif (isset($testlog->uncorrect_answers) && isset($testlog->uncorrect_answers[$answerlog->question->id]))
-                                    {{ $testlog->uncorrect_answers[$answerlog->question->id] }}
+                                @elseif (isset($uncorrect) 
+                                    && isset($uncorrect[$answerlog->question->id])
+                                )
+                                    {{ $uncorrect[$answerlog->question->id] }}
                                 @else
                                     <span style="color: red;">Нет ответа</span>
                                 @endif
